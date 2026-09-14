@@ -1,0 +1,12 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "uikit",
+  "version": "0.1.0",
+  "description": "Design-system and flow-prototype skills: build a project's design system, then prototype features as self-contained flow files on top of it.",
+  "author": {
+    "name": "vincent",
+    "email": "vincenttuandao@gmail.com"
+  },
+  "homepage": "https://github.com/tuanddd/uikit",
+  "repository": "https://github.com/tuanddd/uikit"
+}
