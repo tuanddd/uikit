@@ -1,8 +1,8 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "uikit",
-  "version": "0.1.0",
-  "description": "Design-system and flow-prototype skills: build a project's design system, then prototype features as self-contained flow files on top of it.",
+  "version": "0.2.0",
+  "description": "Design-system, flow-prototype, and implementation skills: define the system, prototype features as HTML flows, then implement them in the project's native stack with no design-system drift.",
   "author": {
     "name": "vincent",
     "email": "vincenttuandao@gmail.com"
