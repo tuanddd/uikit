@@ -1,8 +1,8 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "uikit",
-  "version": "0.3.0",
-  "description": "Design-system, flow-prototype, and implementation skills: define the system, prototype features as HTML flows, then implement them in the project's native stack with no design-system drift.",
+  "version": "0.4.0",
+  "description": "Project-aware onboarding and UI skills: find your next step with /uikit:what, define the system, prototype HTML feature flows, and implement them in the project’s native stack without design-system drift.",
   "author": {
     "name": "vincent",
     "email": "vincenttuandao@gmail.com"
