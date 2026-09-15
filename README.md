@@ -8,7 +8,7 @@ A Claude Code plugin with three skills for a product's UI:
 | prototype | `/uikit:prototype <feature>` | One self-contained HTML flow file per feature in `docs/flows/`, drawn on that design system, with a drift ledger |
 | implement | `/uikit:implement <flow.html>` | Working feature code in the project's native stack, using approved system components and tokens with zero drift |
 
-Run them in that order. The design system is the base every prototype is drawn on; the drift the prototypes record goes back into the design system through `/uikit:prototype drift`. Implementation checks the current approved system: open proposals and reviewed one-offs cannot ship as exceptions. A system gap must be resolved in the system first.
+Run them in that order. The design system is the base every prototype is drawn on; every prototype run ends by asking, for each new drift it drew, whether it goes back into the design system as a reusable component or stays a one-off in its flow. Drift already open across earlier flows, or answered *Decide later*, waits for `/uikit:prototype drift`. Implementation checks the current approved system: open proposals and reviewed one-offs cannot ship as exceptions. A system gap must be resolved in the system first.
 
 `/uikit:implement docs/flows/feature.html` reads every screen and state, inspects the
 actual codebase, maps UI to approved components, builds the feature, and verifies

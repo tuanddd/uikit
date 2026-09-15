@@ -39,7 +39,7 @@ Drift is for what the narrative, the flow or the requirement genuinely asks for:
 
 **Tokens do not drift.** Colour, typeface, radius, shadow and spacing come from the system. A token that does not exist is a question for the user, asked before it is drawn.
 
-Every drift gets a ledger row with its kind, the nearest system component, why it departs, and a first proposal: `promote` (it would serve other features) or `one-off` (it belongs to this feature's story). The drift review, `/uikit:prototype drift`, later decides which become system components, so future runs reuse them instead of drifting again. Ledger format, kinds and the review: [DRIFT.md](DRIFT.md).
+Every drift gets a ledger row with its kind, the nearest system component, why it departs, and a first proposal: `promote` (it would serve other features) or `one-off` (it belongs to this feature's story). Every run then ends by asking the user, one question per new drift it drew, whether that drift goes back into the design system (Phase 7). Reusable drift becomes a system component, so future runs reuse it instead of drifting again; minor drift stays a one-off in its flow. Ledger format, kinds and the review: [DRIFT.md](DRIFT.md).
 
 ## Hard rules
 
@@ -52,7 +52,8 @@ Every drift gets a ledger row with its kind, the nearest system component, why i
 7. **Shared style blocks are identical in every flow file.** A change to one goes into every file at once, through `scripts/sync-blocks.py`. Retyping a block per file is how drift starts.
 8. **Never load the design-system page whole.** It runs to hundreds of KB. Pull the section, class list or component you need with `grep` and `sed`.
 9. **Never bypass a paywall, blur or login wall.** In the user's real browser, open only your own tab and close only what you opened.
-10. **Never touch production code.** A run writes to `docs/flows/` only. The design system page changes only in a drift review, on the user's pick.
+10. **Never touch production code.** A run writes to `docs/flows/` only. The design system page changes only on the user's answer, in Phase 7 or a drift review.
+11. **Ask before the run ends.** A run that drew new drift, as Phase 7 defines it, ends with the fold-back questions. It never folds drift into the system on its own, and never ends without asking.
 
 ## Workflow
 
@@ -158,29 +159,66 @@ Run every check before reporting. A breach is fixed, not reported as a note.
 5. The `principle, not reference` rows, named as the likeliest to be wrong.
 6. Which research route ran: Mobbin MCP, the Mobbin site, or free sources.
 
-Then stop. Promoting drift into the system is the user's call, made in a drift review.
+After the last file's report, go to Phase 7.
 
-**Completion criterion:** every step of the feature is drawn or linked, every UI need maps to the system, an earlier flow or a ledger row, every Phase 5 check passes, and the user has the paths.
+### Phase 7 — Fold drift back
+
+Runs automatically at the end of every run that draws: one feature, several features, or an `update`. With several features it runs once, after the last file's report, over every file the run drew, so a drift two of them share shows up as shared. The procedure is DRIFT.md's *The review*, scoped to this run.
+
+**New drift** is what this phase asks about:
+
+- a drift open in a file this run drew and open in at most one other flow file. That covers a drift no other flow has, its second use, and a drift an earlier flow kept as a one-off that this run reused;
+- every open `guideline` drift in those files, however many flows share it, since keeping an exception is each flow's own call.
+
+In an `update`, only the ledger rows the update added can be new drift, under the same test.
+
+1. **Tally the files this run drew,** one `--file` per file: every open drift they use, then the new drift among them.
+
+   ```bash
+   python3 <skill-dir>/scripts/drift-report.py docs/flows --file <first-file>.html --file <second-file>.html
+   python3 <skill-dir>/scripts/drift-report.py docs/flows --file <first-file>.html --file <second-file>.html --new
+   ```
+
+   Each row still counts every flow file that uses the drift.
+2. **Re-run the reuse test** on every open drift in the first tally, new or not. A drift the system now covers is replaced, not asked about: swap in the system component's markup, remove the drift's CSS and ledger rows, set its `From` in the Components table to `docs/design-system.html`, run DRIFT.md's checks, and report it. A new drift is replaced in every file that uses it; any other covered drift is replaced in the files this run drew, and named for `/uikit:prototype drift` to replace in the rest.
+3. **List the open drift that is not new in one line,** with its count: drift already open across two or more other flows and, in an `update`, rows kept from before the update, once the `--new` tally is narrowed to the rows the update added. With no new drift left, say *"No new drift in this run, nothing to fold back."*, offer to go through the listed drift now, and end the run unless the user says yes.
+4. **Recommend an answer per new drift,** taking the first that fits, with a one-line reason:
+
+   | Answer | Recommend when |
+   |---|---|
+   | **Keep as a one-off** (`one-off`) | Used by one flow file, and either a `detail` or tied to that feature's story. Too small or too specific to earn a place in the system |
+   | **Fold into the nearest component** (`fold`) | A system component nearly covers it; it becomes a variant of that component |
+   | **Add to the system** (`promote`) | Used by two or more flow files, or its anatomy carries nothing specific to this feature, and no system component covers it with a variant |
+
+   A drift an earlier flow kept as a one-off is now used twice: say so, since that is the reason to reconsider it. A `guideline` drift has two answers of its own: **Change the guideline** in the system, or **Keep as this flow's exception**.
+5. **Ask, and wait.** One question per new drift: its name and class, its kind, the files using it, the nearest system component, and the recommended answer first with its reason. The options are the three answers above, or a guideline's two, plus **Decide later**. Ask with the session's question tool when it has one, up to four drifts per call; otherwise ask in plain text. When step 3 listed drift, the last question offers to go through it now; a yes runs DRIFT.md's *The review* over it once these answers are applied. No answer is applied before the user gives it.
+6. **Apply the answers** as DRIFT.md's *The review* applies them, then run its checks. *Decide later* leaves the row `open` for `/uikit:prototype drift`.
+7. **Report** each new drift's final status in one line, and name the design-system components added or extended.
+
+**Completion criterion:** every step of the feature is drawn or linked, every UI need maps to the system, an earlier flow or a ledger row, every Phase 5 check passes, every new drift the run drew has the user's answer or was replaced with a system component, and the user has the paths.
 
 ## Drift review
 
-`/uikit:prototype drift` runs across every flow file, not one feature. Full procedure in [DRIFT.md](DRIFT.md):
+The review runs in two places, with one procedure, in [DRIFT.md](DRIFT.md):
 
-1. Tally with `python3 <skill-dir>/scripts/drift-report.py docs/flows`: each drift, its class, kind, the files using it, proposals and statuses.
-2. Re-run the reuse test against the current system, then propose a verdict per drift: **promote** to a component, **fold** into an existing component as a variant, or **one-off**.
-3. Show the table and wait for the user's picks.
-4. Apply the picks: promoted and folded components go into `docs/design-system.html` under `/uikit:init-design-system`'s component and page rules, and their CSS moves from the product block to the base block in every flow file; one-offs move to their file's `flow-local` block. Ledger statuses update to match.
+- **At the end of every run,** as Phase 7, over the new drift that run drew.
+- **On demand,** as `/uikit:prototype drift`, over every open drift across all flow files: drift answered *Decide later*, drift already open across several flows, and files drawn before Phase 7 existed.
+
+1. Tally with `python3 <skill-dir>/scripts/drift-report.py docs/flows`. A run adds one `--file` per file it drew, and `--new` for its new drift. Each row gives the drift, its class, kind, the files using it, proposals and statuses.
+2. Re-run the reuse test against the current system, then recommend an answer per drift: **one-off**, **fold** into an existing component as a variant, or **promote** to a component; for a guideline, change it or keep the exception.
+3. Ask per drift and wait for the user's answers.
+4. Apply the answers: promoted and folded components go into `docs/design-system.html` under `/uikit:init-design-system`'s component and page rules, and their CSS moves from the product block to the base block in every flow file; one-offs move to their file's `flow-local` block. Ledger statuses update to match.
 
 ## Invocation variants
 
 | Invocation | Behavior |
 |---|---|
-| `/uikit:prototype <feature>` | The full workflow for one feature, one flow file |
-| `/uikit:prototype <feature>, <feature>` | One file per feature, drawn one at a time |
+| `/uikit:prototype <feature>` | The full workflow for one feature, one flow file, ending with the fold-back questions |
+| `/uikit:prototype <feature>, <feature>` | One file per feature, drawn one at a time, with one round of fold-back questions after the last |
 | `/uikit:prototype <feature> --system <path>` | That file as the design system |
-| `/uikit:prototype update <flow-file> <change>` | Redraws or adds steps in an existing flow file, with the same map, ledger and checks |
-| `/uikit:prototype drift` | The drift review across all flow files |
+| `/uikit:prototype update <flow-file> <change>` | Redraws or adds steps in an existing flow file, with the same map, ledger, checks and fold-back questions |
+| `/uikit:prototype drift` | The drift review across all flow files, for drift still open |
 
 ## Tone
 
-Report what you actually drew. If a drift turns out to be taste rather than need, say so and redraw it with the system component. If a step was decided on a principle rather than a reference, flag it: it is the row most likely to be wrong.
+Report what you actually drew. If a drift turns out to be taste rather than need, say so and redraw it with the system component. If a step was decided on a principle rather than a reference, flag it: it is the row most likely to be wrong. When recommending a fold-back answer, say plainly when a drift is too small to earn a place in the system.

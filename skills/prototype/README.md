@@ -25,7 +25,7 @@ A new feature starts as a copy of the flow file closest to it, and every file ca
 - **Not covered, or the nearest component cannot carry what the flow needs:** drift, drawn from the system's tokens and recorded in the ledger.
 - **Tokens never drift.** A new colour, typeface, radius or shadow is asked for first.
 
-`/uikit:prototype drift` reviews the ledger across every flow file and proposes, per drift: promote it to a system component, fold it into an existing one as a variant, or keep it as a one-off. What is promoted goes into the design system, so the next run reuses it.
+Every run ends by asking you about each new drift it drew, with a recommended answer: add it as a system component, fold it into an existing one as a variant, or keep it as a one-off. New drift is a drift no other flow has, its second use, a one-off another flow now reuses, or a broken guideline. Minor drift stays in its flow; reusable drift goes into the system, so the next run reuses it. Drift already open across several flows, and drift you answer *Decide later*, is listed and waits for `/uikit:prototype drift`.
 
 ## Requirements
 
@@ -37,11 +37,11 @@ A new feature starts as a copy of the flow file closest to it, and every file ca
 
 | Invocation | Behavior |
 |---|---|
-| `/uikit:prototype <feature>` | One flow file for that feature |
-| `/uikit:prototype <feature>, <feature>` | One file per feature, drawn one at a time |
+| `/uikit:prototype <feature>` | One flow file for that feature, then the fold-back questions |
+| `/uikit:prototype <feature>, <feature>` | One file per feature, drawn one at a time, then one round of fold-back questions |
 | `/uikit:prototype <feature> --system <path>` | That file as the design system |
-| `/uikit:prototype update <flow-file> <change>` | Redraws or adds steps in an existing file |
-| `/uikit:prototype drift` | Reviews the drift ledger across all flow files |
+| `/uikit:prototype update <flow-file> <change>` | Redraws or adds steps in an existing file, then the fold-back questions |
+| `/uikit:prototype drift` | Asks again about drift still open across all flow files |
 
 ## How it works
 
@@ -54,6 +54,7 @@ A new feature starts as a copy of the flow file closest to it, and every file ca
 | 4 · Draw | Copies the closest file, draws every step, fills the decisions, build notes and drift ledger |
 | 5 · Verify | Self-contained, blocks in sync, anchors, reuse, ledger, craft rules, no sideways scroll |
 | 6 · Report | Paths, reuse tally, drift, the decisions resting on a principle |
+| 7 · Fold back | Asks, per new drift, whether it joins the design system or stays a one-off, then applies your answers |
 
 ## Files
 
@@ -65,5 +66,5 @@ CRAFT-RULES.md           eight layout constraints every screen is built and chec
 REFERENCE-SOURCES.md     the Mobbin check, Mobbin MCP first and the site second, free fallbacks, banking
 templates/flow.html      the skeleton for a project's first flow file
 scripts/sync-blocks.py   copies shared style blocks into every flow file; --check verifies
-scripts/drift-report.py  tallies drift across flow files for the review
+scripts/drift-report.py  tallies drift across flow files for the review; --file and --new scope it to one run
 ```

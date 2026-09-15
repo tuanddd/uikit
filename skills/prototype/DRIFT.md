@@ -1,6 +1,6 @@
 # Drift
 
-The design system is the base every screen is drawn on. Drift is anything on a screen the system does not already provide. It is allowed, it is recorded, and it is reviewed, so that what serves more than one feature becomes part of the system and the next run reuses it instead of drifting again.
+The design system is the base every screen is drawn on. Drift is anything on a screen the system does not already provide. It is allowed, it is recorded, and a run that draws new drift ends by asking the user whether it goes back into the system, so that what serves more than one feature becomes part of the system and the next run reuses it instead of drifting again, while minor drift stays in its flow.
 
 ## Reuse first
 
@@ -69,7 +69,7 @@ A file with no drift says so in one line in place of the table: `<p class="a-emp
 | `data-class` | The CSS class it is drawn with, or `—` for a guideline |
 | `data-kind` | `component`, `variant`, `detail`, `guideline` |
 | `data-proposal` | `promote` (it would serve other features) or `one-off` (it belongs to this feature's story): the first read, made while drawing |
-| `data-status` | `open`, then `promoted`, `folded` or `one-off` after a review |
+| `data-status` | `open`, then `promoted`, `folded` or `one-off` once the user answers; *Decide later* keeps it `open` |
 
 A drift reused from an earlier flow file keeps its name and class and gets a row in this file's ledger too, so the tally counts the second use.
 
@@ -85,24 +85,31 @@ All of it is built from the system's tokens.
 
 ## The review
 
-`/uikit:prototype drift`
+Two ways in, one procedure:
 
-1. **Tally.** `python3 <skill-dir>/scripts/drift-report.py docs/flows` prints every open drift across the flow files: name, class, kind, the files using it, proposals and statuses. Add `--all` to include reviewed rows.
-2. **Re-run the reuse test** on every open row against the current system. The system may have gained a component since the drift was drawn; a drift the system now covers is replaced in its files, not promoted.
-3. **Propose a verdict per row:**
+| Entry | Scope |
+|---|---|
+| Phase 7 of every drawing run, automatically | Questions for the new drift that run drew (`drift-report.py docs/flows --file <file>.html --new`, one `--file` per file drawn), after a reuse re-check of every open drift those files use. SKILL.md, Phase 7, defines new drift |
+| `/uikit:prototype drift`, on demand | Every open drift across all flow files |
+
+1. **Tally.** `python3 <skill-dir>/scripts/drift-report.py docs/flows` prints every open drift across the flow files: name, class, kind, the files using it, proposals and statuses. `--file` limits it to drift used by the named files, still counting every file that uses each one. `--new`, used with `--file`, keeps only new drift: open in a named file and open in at most one other flow file, or any open guideline. Add `--all` to include reviewed rows.
+2. **Re-run the reuse test** on every row in scope against the current system. The system may have gained a component since the drift was drawn. A drift the system now covers is replaced, not promoted: swap in the system component's markup in every file that uses it, remove the drift's CSS and ledger rows, set its `From` in the Components table to `docs/design-system.html`, then run the step 6 checks.
+3. **Propose a verdict per row,** taking the first that fits:
 
    | Verdict | When |
    |---|---|
-   | **promote** | Used by two or more features, or its anatomy carries no feature-specific content, and no system component covers it with a variant |
+   | **one-off** | Used by one feature, and either a `detail` or tied to that feature's story: too small or too specific for the system |
    | **fold** | A system component nearly covers it; it becomes a variant of that component instead of a new one |
-   | **one-off** | Used by one feature, and its anatomy is tied to that feature's story |
+   | **promote** | Used by two or more features, or its anatomy carries no feature-specific content, and no system component covers it with a variant |
 
-   A `guideline` drift used by two or more features is a sign the guideline does not fit this product. Say so; changing the guideline is the user's call.
+   A drift one feature kept as a one-off that another now reuses is no longer tied to one story; say so. A `guideline` drift is proposed as **change the guideline** or **keep as this flow's exception**. One used by two or more features is a sign the guideline does not fit this product; say so. Changing the guideline is the user's call.
 
-4. **Show the table and wait.** The user picks per row. Nothing is promoted without a pick.
-5. **Apply the picks:**
-   - **promote or fold:** add the component or variant to `docs/design-system.html` following the `init-design-system` skill's rules (`references/components.md`, `hierarchy.md`, `polish.md`, `html-spec.md`): a tab in the components section, every state live, real copy. Move its CSS from the product block to the base block in one flow file, then sync both blocks to the rest. Update every file's components table (`From` becomes `docs/design-system.html`) and ledger status (`promoted` or `folded`). If the project's design system also ships as installed components, name the component that now needs writing and ask before touching code.
+4. **Ask per row and wait.** Lead with the recommended verdict and its one-line reason. *Decide later* is always an option and leaves the row `open`. Nothing is promoted without an answer.
+5. **Apply the answers:**
+   - **promote or fold:** add the component or variant to `docs/design-system.html` following the `init-design-system` skill's rules (`references/components.md`, `hierarchy.md`, `polish.md`, `html-spec.md`): a tab in the components section, every state live, real copy. Move its CSS from the product block to the base block in one flow file, then sync both blocks to the rest. Update every file's components table (`From` becomes `docs/design-system.html`) and ledger status (`promoted` or `folded`). If the project's design system also ships as installed components, name the component or variant that now needs writing, for `/uikit:implement`; the review never writes code.
    - **one-off:** move its CSS from the product block to the `flow-local` block of the one file that uses it, sync the product block, set the status to `one-off`.
+   - **change the guideline:** rewrite the rule in `docs/design-system.html` so the flow's case is allowed, and set the status to `promoted` in every file that uses it.
+   - **keep as this flow's exception:** set the status to `one-off`. A guideline drift has no CSS to move.
 6. **Verify.** `sync-blocks.py --check` exits 0, `drift-report.py --all` shows the new statuses, and every touched flow file renders as it did.
 
 ## Files drawn before the ledger existed

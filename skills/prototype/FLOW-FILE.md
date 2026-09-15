@@ -107,6 +107,6 @@ Every class used inside a frame is in this table. `From` is `docs/design-system.
 1. One line on what the files are, and that they open in a browser with no build step.
 2. **What the files are for:** onboarding, and the base a build takes routes, components, copy and decisions from.
 3. **Inside a file:** the sections table above, shortened.
-4. **Rules that keep drift down:** the shared blocks are identical in every file; a new feature starts as a copy of its closest file; screens are static with mock values; nothing outside the system's tokens; every drift is in the ledger and reviewed with `/uikit:prototype drift`.
+4. **Rules that keep drift down:** the shared blocks are identical in every file; a new feature starts as a copy of its closest file; screens are static with mock values; nothing outside the system's tokens; every drift is in the ledger, and the run that draws a new drift asks whether it joins the design system or stays a one-off.
 5. **The index:** a table per group, `# · Feature (linked) · Steps`.
 6. **Mock values:** today's date, the cast, the sample records every file uses. A file that needs a new value adds it here first.

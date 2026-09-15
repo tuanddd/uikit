@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -74,21 +75,50 @@ def main():
     parser = argparse.ArgumentParser(description="Tally drift from the design system across flow files.")
     parser.add_argument("flows_dir")
     parser.add_argument("--all", action="store_true", help="include reviewed drift, not only open rows")
+    parser.add_argument("--file", action="append", default=[], help="only drift used by this flow file, still counting every file that uses it; repeat for several")
+    parser.add_argument("--new", action="store_true", help="with --file: only new drift, open in a named file and open in at most one other flow file, or an open guideline")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+    if args.new and not args.file:
+        parser.error("--new needs at least one --file")
+
+    flows = Path(args.flows_dir)
+    paths = sorted(flows.glob("*.html"))
+    names = {path.name for path in paths}
+    scope, unknown = set(), []
+    for given in args.file:
+        path = Path(given)
+        inside = path.parent == Path(".") or path.resolve().parent == flows.resolve()
+        if inside and path.name in names:
+            scope.add(path.name)
+        else:
+            unknown.append(given)
+    if unknown:
+        sys.exit(f"not a flow file in {args.flows_dir}: {', '.join(unknown)}")
 
     tally = {}
-    for path in sorted(Path(args.flows_dir).glob("*.html")):
+    for path in paths:
         for row in drift_rows(path):
             key = row["class"] if row["class"] not in ("", "—") else row["name"]
-            entry = tally.setdefault(key, {"name": row["name"], "class": row["class"], "kinds": set(), "proposals": set(), "statuses": set(), "files": []})
+            entry = tally.setdefault(key, {"name": row["name"], "class": row["class"], "kinds": set(), "proposals": set(), "statuses": set(), "files": [], "open_in": []})
             entry["kinds"].add(row["kind"])
             entry["proposals"].add(row["proposal"])
             entry["statuses"].add(row["status"])
             if path.name not in entry["files"]:
                 entry["files"].append(path.name)
+            if row["status"] == "open" and path.name not in entry["open_in"]:
+                entry["open_in"].append(path.name)
 
-    entries = [e for e in tally.values() if args.all or "open" in e["statuses"]]
+    def is_new(entry):
+        open_in = set(entry["open_in"])
+        return bool(scope & open_in) and ("guideline" in entry["kinds"] or len(open_in - scope) <= 1)
+
+    entries = [
+        e for e in tally.values()
+        if (args.all or "open" in e["statuses"])
+        and (not scope or scope & set(e["files"]))
+        and (not args.new or is_new(e))
+    ]
     entries.sort(key=lambda e: (-len(e["files"]), e["name"].lower()))
 
     if args.json:
