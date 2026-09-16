@@ -17,7 +17,8 @@ Two layers. Keep them separate.
 --brand-stone-50: oklch(0.985 0.004 95);
 --brand-teal-700: oklch(0.420 0.062 165);
 
-/* Layer 2 — shadcn semantic tokens. What components actually consume. */
+/* Layer 2 — semantic tokens. What components actually consume.
+   The names follow the shadcn convention; every stack's components read them. */
 --background: var(--brand-stone-50);
 --primary:    var(--brand-teal-700);
 ```
@@ -158,11 +159,12 @@ from that choice, so fill those two rows first and derive the rest.
 | `warning` | `oklch(0.800 0.140 85)` | Caution fill | dark text |
 | `success` | `oklch(0.520 0.110 155)` | Confirmed fill | light text |
 
-### shadcn map
+### The CSS variable map
 
-Fill every row. An unmapped variable is an unstyled component.
+The names follow the shadcn convention; they are the contract every stack's components read,
+React included. Fill every row. An unmapped variable is an unstyled component.
 
-| shadcn variable | Source token |
+| CSS variable | Source token |
 |---|---|
 | `--background` | `neutral-50` |
 | `--foreground` | `ink` |
@@ -317,7 +319,7 @@ Compact. Comfortable adds one step to gutter and margin.
 | `radius-xl` | `calc(var(--radius) + 4px)` | Heroes, sheets |
 | `radius-full` | `9999px` | Avatars, pills |
 
-Set `--radius` once. shadcn derives the rest.
+Set `--radius` once. The whole radius scale derives from it.
 
 **Concentric rule:** `outer radius = inner radius + padding`.
 A 12px inner element inside 8px of padding needs a 20px outer radius. Anything else
@@ -394,17 +396,18 @@ If the brand forbids depth entirely, ship `shadow-border` alone as a flat 1px sp
 
 ## 7. Icons
 
-**Registry: HugeIcons.** One registry for every icon in the product.
+**Registry: HugeIcons.** One registry for every icon in the product. Every stack renders it
+through one wrapper component, so the semantic map is the single source.
 
-```bash
-npm i @hugeicons/react @hugeicons/core-free-icons
-```
+| Stack | Package | Holds |
+|---|---|---|
+| React | `npm i @hugeicons/react @hugeicons/core-free-icons` | `HugeiconsIcon`, the renderer |
+| Svelte | `npm i @hugeicons/svelte @hugeicons/core-free-icons` | the Svelte renderer |
+| Astro | `npm i @hugeicons/core-free-icons` only | raw node data, rendered by a local `Icon.astro` |
+| Any | `@hugeicons/core-free-icons` | Stroke Rounded — the shipped style |
+| Any | `@hugeicons-pro/core-solid-rounded` | The solid twin, only with a pro licence |
 
-| Package | Holds |
-|---|---|
-| `@hugeicons/react` | `HugeiconsIcon`, the renderer |
-| `@hugeicons/core-free-icons` | Stroke Rounded — the shipped style |
-| `@hugeicons-pro/core-solid-rounded` | The solid twin, only with a pro licence |
+The React renderer, as the reference:
 
 ```tsx
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -414,7 +417,8 @@ import { Search01Icon } from "@hugeicons/core-free-icons";
 ```
 
 Props: `icon` · `altIcon` · `showAlt` · `size` (24) · `color` (`currentColor`) ·
-`strokeWidth` (1.5) · `absoluteStrokeWidth` · `className`.
+`strokeWidth` (1.5) · `absoluteStrokeWidth` · `className`. The Svelte renderer takes the
+same props; the Astro wrapper reads the size and stroke tokens itself (`setup.md` § Icons).
 
 ### Style
 
@@ -481,7 +485,7 @@ The label holds one line. If it must wrap, the row aligns to the first line, not
 Roles, not pictures. One row per recurring meaning in this product. Start from these — the
 components in `components.md` reference them by role — then add the roles the domain needs.
 
-**Structural — every product ships these.** They are the ones the shadcn primitives read.
+**Structural — every product ships these.** They are the ones the primitives read.
 
 | Role | HugeIcons name | Where |
 |---|---|---|
@@ -585,10 +589,12 @@ The per-element property map lives in `polish.md` § Transitions.
 
 ## Output as code
 
-Write the tokens twice, same values:
+One authored source, two projections. Write the token table once, as `tokens.json`:
 
-1. **CSS** — into the project's `globals.css` (see `shadcn-setup.md`).
-2. **`tokens.json`** — flat, one `$value` and one `$description` (the role) per token,
-   plus one top-level `density` key: `compact` or `comfortable`.
+1. **`tokens.json`** — flat, one `$value` and one `$description` (the role) per token, plus
+   one top-level `density` key: `compact` or `comfortable`.
+2. **The CSS `:root` block** — derived from `tokens.json` (see `setup.md` § 2).
 
-Both files are generated from the same table. If they disagree, the CSS is wrong.
+The viewer prints values from `tokens.json` and fills swatches from the CSS variables, so the
+two must come from the same file, never be typed independently. `tokens.json` is canonical;
+the CSS is its projection. If they disagree, the CSS is wrong.

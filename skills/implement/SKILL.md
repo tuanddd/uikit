@@ -110,8 +110,9 @@ styling approach, UI and icon libraries, data/forms/validation conventions, and
 available checks. In a monorepo, identify the target app and its shared packages.
 Documentation that disagrees with installed code is a discrepancy to resolve.
 
-Locate the system: the explicit `--system` path, repo-designated sources,
-`docs/design-system.html`, `DESIGN.md`, `tokens/`, theme files, CSS variables,
+Locate the system: the explicit `--system` path, repo-designated sources, a
+`/uikit/design-system` route and the components it imports, `docs/design-system.html`,
+`DESIGN.md`, `tokens/`, theme files, CSS variables,
 Tailwind configuration, `components.json`, and installed component examples.
 These are discovery candidates, not an invented precedence order. Read relevant
 token groups, component anatomy, variants, interaction states, responsive rules,
@@ -161,7 +162,7 @@ The approved project system takes precedence over stylistic defaults here and in
 those references. Do not enforce React, shadcn, HugeIcons, OKLCH conversion, two
 hues, 400/500 weights, a particular spacing grid, compact density, shadow-borders,
 or example durations on a system that specifies otherwise. Do not initialize or
-regenerate the design-system page. Reuse principles through the project's tokens.
+regenerate the design-system route or page. Reuse principles through the project's tokens.
 If a locked system rule prevents accessible UI, surface the precise conflict for
 system correction; do not quietly weaken accessibility or change the token.
 

@@ -1,7 +1,13 @@
-# The HTML page
+# The fallback page
+
+**Fallback only.** Use this spec only when the project cannot host a route — no framework or
+bundler (`stacks.md` § 1). Otherwise build the live viewer (`viewer-spec.md`), which imports
+the real components and cannot drift.
 
 `docs/design-system.html`. Standalone, no build step, no CDN. Set in the brand's own fonts
-and colors — the page is a sample of the system.
+and colors — the page is a sample of the system. Because it redraws every token and
+component, it is a second definition: ship it only where nothing else can render, and say in
+one line that you fell back.
 
 Title: `{Project name} design system`
 

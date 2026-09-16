@@ -1,20 +1,24 @@
 # Components
 
-Three tiers. Section 9 tabs them: core first, composite second, domain last.
+Three tiers. Section 9 groups them: core first, composite second, domain last.
 
-Every tab carries the same four blocks, in this order:
+Every group carries the same four blocks, in this order:
 
 1. **Live render** — every variant, side by side, every icon slot filled
-2. **State row** — default · hover · focus-visible · active · disabled · error/loading,
-   rendered, with the transition live on the interactive ones
+2. **State row** — default · disabled · loading · error/selected/open, whatever the
+   component's own API exposes, rendered, with the transition live on the interactive ones
 3. **Variant table** — variant, background, text, edge (border or shadow token), radius,
    icon slot, transitioned properties
-4. **Usage** — the import line and one JSX snippet with real product copy
+4. **Usage** — the import line and one snippet in the stack's syntax, with real product copy
 
-No paragraph anywhere in a tab. Every component ships the `hierarchy.md` ranking and then
+No paragraph anywhere in a group. Every component ships the `hierarchy.md` ranking and then
 the `polish.md` pass, at the density preset from `tokens.md` §3 — compact unless the user
 or the domain moved it. Inside every component: one primary element, labels below the
 values they name, one primary button.
+
+The variant names below (`primary`, `secondary`, `ghost`, `destructive`, …) are the
+component's API. They are the same in every stack, so the viewer reads one vocabulary
+whatever it renders.
 
 ### Every specimen is labelled under itself
 
@@ -37,8 +41,9 @@ One exception: when specimens stack vertically, one per row — the type ramp, t
 scale — the label may sit in a second column of that same row. The pairing is still
 unambiguous because the row is the cell.
 
-Markup in `html-spec.md` § Labelling a specimen. Every drawn thing on the page uses it —
-swatches, bars, corners, strokes, shadows, icons, and every component variant and state.
+The `Specimen` helper in `viewer-spec.md` enforces this in its own structure. Every drawn
+thing in the viewer uses it — swatches, bars, corners, strokes, shadows, icons, and every
+component variant and state.
 
 ---
 
@@ -100,17 +105,17 @@ scannable. Draw them there generously, and cut only what fails the strip test.
    meta line of location, date, and area draws three, and reads faster for it.
 3. Size pairs with the text beside it; stroke matches that text's weight. An uppercase or
    letter-spaced label takes the icon one size up (`icon-sm` beside an eyebrow).
-3a. **The label holds one line.** Widen the cell, drop a column, or shorten the copy before
+4. **The label holds one line.** Widen the cell, drop a column, or shorten the copy before
    letting it wrap. A row that can still wrap aligns `flex-start` with the icon box at
    `height: 1lh`, so the glyph centres on the first line and stays there. Never
    `align-items: center` on a row whose text can wrap.
-4. Gap is `space-1` at `icon-xs`, `space-2` from `icon-sm` up.
-5. `currentColor` inside text, buttons, and links. `--muted-foreground` standalone.
-6. Beside a label: `aria-hidden="true"`. Alone: `aria-label`.
-7. A state change swaps the glyph, never the color alone. Cross-fade at `--dur-icon`.
-8. Icons transition with the control they sit in — `color`, `opacity`, `transform` — never
+5. Gap is `space-1` at `icon-xs`, `space-2` from `icon-sm` up.
+6. `currentColor` inside text, buttons, and links. `--muted-foreground` standalone.
+7. Beside a label: `aria-hidden="true"`. Alone: `aria-label`.
+8. A state change swaps the glyph, never the color alone. Cross-fade at `--dur-icon`.
+9. Icons transition with the control they sit in — `color`, `opacity`, `transform` — never
    independently, and never on a delay.
-9. **Two tests, both run:** strip every icon out — anything that reads just as clearly was
+10. **Two tests, both run:** strip every icon out — anything that reads just as clearly was
    decoration. Then squint at each composite — if nothing marks where one kind of fact ends
    and the next begins, it is under-drawn.
 
@@ -118,7 +123,7 @@ scannable. Draw them there generously, and cut only what fails the strip test.
 
 ## Tier 1 — Core
 
-shadcn primitives, unmodified except by tokens.
+Core primitives, unmodified except by tokens.
 
 | Component | Must show | Icon slot |
 |---|---|---|
@@ -149,8 +154,9 @@ Rules:
 - **Every state change is a transition, never a jump.** Named properties, `--ease-out`,
   `--dur-fast`; `:active` compresses the control to `scale(0.985)` at `--dur-press`.
   Per-element property map in `polish.md` § Transitions.
-- Icons come from HugeIcons via `HugeiconsIcon`, at a size token and a stroke token.
-  Buttons take `icon-md`; inputs, badges, and tooltip triggers take `icon-sm`.
+- Icons come from HugeIcons, rendered through the project's one icon component, at a size
+  token and a stroke token. Buttons take `icon-md`; inputs, badges, and tooltip triggers
+  take `icon-sm`.
 - Conditional icons cross-fade opacity, scale, and a small blur — never a hard cut.
 - Icons align optically, not by bounding box.
 - Icon-only buttons carry `aria-label`; an icon beside a label carries `aria-hidden="true"`.
@@ -177,7 +183,7 @@ Core parts assembled. Show the assembly, numbered.
 | Tabs | 1 list · 2 active marker · 3 panel | Leading icon only if every tab has one that earns it. Otherwise none. |
 | Table | 1 header row · 2 sortable column · 3 body rows · 4 status cell · 5 row action · 6 selected row · 7 empty state · 8 footer | Sort state on every sortable header, direction on the sorted one · status glyph in the status column · `icon-more` in the last cell |
 | Pagination | 1 previous · 2 numbers · 3 ellipsis · 4 next · 5 current · 6 disabled ends | Previous and next arrows at `icon-sm` · the ellipsis glyph for the skipped range |
-| Toast (sonner) | success · error · loading | One leading status mark, `icon-md` · close trailing |
+| Toast | success · error · loading | One leading status mark, `icon-md` · close trailing |
 | Empty state | 1 icon at `icon-xl` · 2 line · 3 one action | The `icon-xl` mark. The largest icon in the product. |
 
 Card container: `radius-lg`, `--shadow-border`, overflow hidden, padding at the density
@@ -264,10 +270,12 @@ The component that leads with what is **wrong** is the one nobody can fake.
 ### Ship it as code
 
 ```
-src/components/<domain>/<Name>.tsx
+React   src/components/<domain>/<Name>.tsx
+Svelte  src/lib/components/<domain>/<Name>.svelte
+Astro   src/components/<domain>/<Name>.astro
 ```
 
-Composed from installed shadcn primitives. Typed props. All states implemented.
+Composed from the stack's primitives. Typed props. All states implemented.
 Polish pass applied: `tabular-nums` on every measurement, `text-wrap: balance` on the
 title and `pretty` on the human note, `--shadow-border` on the surface, a `--dur-fast`
 transition on every interactive part, density preset on the padding, staged entrance if it

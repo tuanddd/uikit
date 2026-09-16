@@ -40,7 +40,7 @@ never synthetic bold.
 
 ### Color
 
-| Level | Token | shadcn variable | Use |
+| Level | Token | CSS variable | Use |
 |---|---|---|---|
 | Primary text | `ink` | `--foreground` | Titles, values, figures, body |
 | Secondary text | `neutral-700` | `--muted-foreground` | Labels, meta, helper, descriptions |
@@ -79,7 +79,7 @@ either redundant or is the better heading.
 
 One primary action per view. Everything else steps down.
 
-| Rank | shadcn variant | Fill | Icon slot |
+| Rank | Variant | Fill | Icon slot |
 |---|---|---|---|
 | Primary | `default` | `primary-700` | None — text alone |
 | Secondary | `secondary` · `outline` | `neutral-100` · border only | Leading verb |
@@ -89,6 +89,10 @@ One primary action per view. Everything else steps down.
 
 A row-level delete is routine. A filled `error` button on every row makes the one
 irreversible confirm unreadable.
+
+Variant names are the component's API and stay the same in every stack — the Svelte and
+Astro components take `variant="secondary"` too, so a reader of the viewer reads one
+vocabulary.
 
 ---
 

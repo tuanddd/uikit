@@ -1,25 +1,33 @@
 # init-design-system
 
 A [Claude Code](https://claude.com/claude-code) skill that builds a project's design system
-as a visual HTML page **plus** a working shadcn/ui setup — OKLCH colors, typography,
-spacing, radius, borders, layered shadows, logo, and components delivered as installed
-React code.
+as a **live route** at `/uikit/design-system` plus a working component setup in the
+project's own stack — OKLCH colors, typography, spacing, radius, borders, layered shadows,
+logo, and components authored natively (React / shadcn, Astro, or Svelte / Bits UI).
 
 It reuses tokens already in the repo instead of inventing new ones. The output is
 code-ready, not a mood board.
 
 ## What it produces
 
-Two deliverables, both required:
+Three deliverables. The first two are always required.
 
-1. **`docs/design-system.html`** — a standalone page (no build step, no CDN) set in the
-   brand's own fonts and colors, with nine sections: Logo, Colors, Typography, Spacing,
-   Radius, Border, Shadow, Icons, Components.
-2. **The project itself**, wired with shadcn/ui on those tokens, so the next agent builds
-   with the system rather than around it.
+1. **A live route** — `/uikit/design-system`, built in the project's own stack, with nine
+   sections: Logo, Colors, Typography, Spacing, Radius, Border, Shadow, Icons, Components.
+   Its Components section imports the project's real components; its token values print from
+   `tokens.json`, the one source the CSS is derived from. The viewer cannot drift: nothing on
+   it is a second copy.
+2. **The project itself**, wired with the tokens and native components, so the next agent
+   builds with the system rather than around it.
+3. **`docs/design-system.html`** — fallback only, for a project with no framework that can
+   host a route.
 
 Every value is drawn rather than described: spacing is a bar chart, radius shows real
-curvature, shadow shows real elevation, type shows real specimens.
+curvature, shadow shows real elevation, type shows real specimens — and the components are
+the shipped ones, imported unmodified.
+
+The route is a dev surface: hidden in production by env detection, unlinked, `noindex`,
+disallowed in `robots.txt`, and excluded from the sitemap.
 
 ## Opinions it ships by default
 
@@ -30,12 +38,19 @@ curvature, shadow shows real elevation, type shows real specimens.
 | Shadows carry surfaces | Three-layer shadow-border; borders are for lines |
 | 4-point spacing | 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64, and only these |
 | Constrained scales | ~1.2 modular type scale, five shadow tokens, five radius tokens |
-| shadcn/ui is the base | Every component on the page exists as installed React code |
+| The stack's components are the base | Every specimen is a real component, imported: shadcn/Radix, Bits UI, or native Astro |
+| The viewer cannot drift | Components are imported; token values print from `tokens.json`, fills read the CSS derived from it |
 | HugeIcons is the registry | One icon set, sizes off the scale, icons are structural |
 | Everything interactive transitions | Named properties, `--ease-out`, under 200ms |
 
 Two rules never move, whatever you ask for: contrast that passes WCAG, and an accessible
 name on every control. Everything else yields to an explicit instruction.
+
+## Stacks
+
+Native components and a live route are authored for **React** (Next App / Pages, Vite,
+Remix, React Router), **Astro**, and **Svelte** (SvelteKit, Vite). An inaccessible stack, or
+a project with no framework or bundler, falls back to the static page.
 
 ## Install
 
@@ -65,17 +80,21 @@ Or invoke it directly:
 ## Layout
 
 ```
-SKILL.md                     entry point — stance, defaults, the six steps
+SKILL.md                     entry point — stance, defaults, the eight steps
 references/
-  tokens.md                  the eight token groups and their shadcn mappings
-  shadcn-setup.md            framework detection, init, token injection, icon swap
+  tokens.md                  the eight token groups and their CSS variable map
+  stacks.md                  stack detection; per-stack route, component, primitive, icon, env
+  setup.md                   wiring per stack: token injection, primitives, fonts, icons, verify
+  viewer-spec.md             the live route: page shell, specimen helper, nine sections, gating
   components.md              core → composite → domain component tiers
   polish.md                  font smoothing, text wrapping, shadow-borders, focus rings
-  html-spec.md               section markup and the visualization recipes
+  hierarchy.md               the three levers, label demotion, button ranks
+  html-spec.md               fallback page, when a route cannot exist
 ```
 
 ## Requirements
 
-The skill assumes a React project it can wire shadcn/ui into. It reads `package.json` to
-detect the framework, and harvests any existing `DESIGN.md`, `tokens.json`, `theme.ts`,
-`globals.css`, `tailwind.config.*`, or `components.json` before filling gaps.
+The skill reads `package.json` and the file layout to detect the stack, and harvests any
+existing `DESIGN.md`, `tokens.json`, `theme.ts`, `globals.css`, `app.css`,
+`tailwind.config.*`, or `components.json` before filling gaps. React projects are wired with
+shadcn/ui; Svelte projects with Bits UI; Astro projects get native components.
