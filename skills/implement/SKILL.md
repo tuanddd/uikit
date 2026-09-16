@@ -112,11 +112,12 @@ styling approach, UI and icon libraries, data/forms/validation conventions, and
 available checks. In a monorepo, identify the target app and its shared packages.
 Documentation that disagrees with installed code is a discrepancy to resolve.
 
-Locate the system: the explicit `--system` path, repo-designated sources, a
-`/uikit/design-system` route and the components it imports, `docs/design-system.html`,
-`DESIGN.md`, `tokens/`, theme files, CSS variables,
-Tailwind configuration, `components.json`, and installed component examples.
-These are discovery candidates, not an invented precedence order. Read relevant
+Locate the system in this order: the explicit `--system` path wins; otherwise
+`docs/uikit.md` (the `/uikit:setup` record) when present; otherwise repo-designated sources.
+Then the discovery candidates — a `/uikit/design-system` route and the components it imports,
+`docs/design-system.html`, `DESIGN.md`, `tokens/`, theme files, CSS variables,
+Tailwind configuration, `components.json`, and installed component examples; these are
+candidates, not an invented precedence order. Read relevant
 token groups, component anatomy, variants, interaction states, responsive rules,
 and themes. Match the reference values to their actual code definitions.
 

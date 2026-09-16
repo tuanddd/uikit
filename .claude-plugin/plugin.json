@@ -1,8 +1,8 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "uikit",
-  "version": "0.6.0",
-  "description": "Project-aware onboarding and UI skills: find your next step with /uikit:what, define the system as a live /uikit/design-system route in the project’s own stack, prototype features as flow definitions rendered at /uikit/flows from the real components, and implement them natively without design-system drift.",
+  "version": "0.7.0",
+  "description": "Project-aware onboarding and UI skills: a single map (docs/map.md) and a router (/uikit:what) that names your next step, an optional /uikit:setup that records the project’s system, stack, and flows once, defining the system as a live /uikit/design-system route in the project’s own stack, prototyping features as flow definitions rendered at /uikit/flows from the real components, and implementing them natively without design-system drift.",
   "author": {
     "name": "vincent",
     "email": "vincenttuandao@gmail.com"

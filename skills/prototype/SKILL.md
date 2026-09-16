@@ -88,13 +88,13 @@ ToolSearch("+mobbin")
 - **Tools load:** tell the user in one line, then continue. *"Mobbin MCP is connected. It is a paid service; this run uses it for the reference lookups, about one search per step."* The first lookup doubles as the auth check: if it fails with an auth or quota error, stop and say so.
 - **No tools:** stop and ask. *"Mobbin MCP is not connected. It comes with a paid Mobbin plan and is where this skill finds how shipped products solved each step. Connect it and rerun, or continue on free sources, where more decisions rest on a principle instead of a reference."* Wait for the answer.
 
-**2. The design system.** Find the live system: the `/uikit/design-system` route and the components it imports, `tokens.json`, and the global stylesheet. Then `docs/design-system.html` (the fallback), `docs/**/design-system*.html`, and machine-readable tokens. A path passed with `--system` wins.
+**2. The design system.** Read `docs/uikit.md` (the `/uikit:setup` record) first when it exists: it names the approved source. Then find the live system: the `/uikit/design-system` route and the components it imports, `tokens.json`, and the global stylesheet. Then `docs/design-system.html` (the fallback), `docs/**/design-system*.html`, and machine-readable tokens. A path passed with `--system` wins.
 
 - One found: it is the base. Note the component directory and import aliases — Phase 4 imports from them.
 - Several found: ask which.
 - None found: say so and recommend `/uikit:init-design-system` first. If the user goes ahead anyway, distill a token block from whatever tokens the repo has; every component is then drift, and the ledger says so.
 
-**3. Flows already drawn.** Look for `docs/flows/README.md`, `docs/flows/*.json` (definitions) and `docs/flows/*.html` (legacy files from the static model).
+**3. Flows already drawn.** Look for `docs/flows/README.md`, `docs/flows/*.json` (definitions) and `docs/flows/*.html` (legacy files from the static model). When `docs/uikit.md` records a different flows path, that path is the one.
 
 - Found: they are the baseline. Their mock values, cast, naming and shell are reused as they are. A legacy HTML flow is read for its ledger and components; migrate it on request.
 - None: this run creates `docs/flows/`, its README, and the first flow.

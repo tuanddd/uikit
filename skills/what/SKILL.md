@@ -18,7 +18,10 @@ to carry out the recommendation belongs to that skill's own workflow.
 Use the current conversation first. Answer a narrow question directly; inspect
 only the files needed to ground it. For a bare invocation, inspect the project:
 
-- Read applicable repository instructions and a short product overview.
+- Read applicable repository instructions and a short product overview. Read
+  `docs/uikit.md` (the `/uikit:setup` record) first when it exists: it is the recorded
+  design-system source, stack, and flows directory, and it settles what discovery would
+  otherwise guess.
 - Identify the app and stack from manifests and existing code. If the working
   directory is the plugin itself, explain that the next step is to open the user's
   application project. If there is no app yet, ask whether they have an existing
@@ -40,8 +43,9 @@ Stop inspecting once there is enough evidence for a useful recommendation. If th
 user's intent remains unclear, summarize what you found and ask one focused
 question about their desired outcome. Do not make them repeat discoverable facts.
 
-On a first-use or installation question, check the available skill catalog for
-the four UIkit skills. Distinguish files found on disk from skills actually exposed
+On a first-use or installation question, check the available skill catalog for all the
+UIkit skills — `what`, `setup`, `init-design-system`, `prototype`, `implement`, and
+`using-uikit`. Distinguish files found on disk from skills actually exposed
 by the current session. If the catalog is unavailable, say availability is unverified
 and suggest checking the `/uikit:` commands after `/reload-plugins` or a new session.
 For installation details, read the plugin's [README](../../README.md). When this
@@ -49,17 +53,23 @@ skill cannot be invoked at all, that README is the recovery path.
 
 ## Choose the next action
 
-Read the relevant sibling skill before recommending its syntax or prerequisites.
-These files own their execution rules; this guide does not override them.
+Route within the map, never around it. Read [../../docs/map.md](../../docs/map.md): it is the
+canonical routing truth — the main flow, the stages, the on-ramps, and who invokes what. This skill
+decides where the user sits on that map and names one next action; it never restates the map's
+on-ramps table, which can only drift from the canonical copy.
 
-| User's situation | Recommendation |
-|---|---|
-| Existing React, Astro, or Svelte project needs a design foundation | [init-design-system](../init-design-system/SKILL.md): `/uikit:init-design-system`. Explain that it creates a live `/uikit/design-system` route and authors the components natively in the project's stack. |
-| Existing approved system, feature idea to explore | [prototype](../prototype/SKILL.md): `/uikit:prototype <feature>`. Produces a flow definition whose screens render the real components at a dev route, with mock data, rather than an interactive production feature. |
-| Existing flow needs changes | [prototype](../prototype/SKILL.md): `/uikit:prototype update <flow> <change>`. Reuse or update the existing definition and route. |
-| Open proposals or deferred drift decisions | [drift review](../prototype/DRIFT.md): `/uikit:prototype drift`. Drift means a component, variant, detail, or guideline departure that the approved system does not provide. |
-| Flow ready to build using an approved system | [implement](../implement/SKILL.md): `/uikit:implement <flow>`. Preserves the project's native stack and verifies real behavior and system compliance. |
-| Returning to ongoing work | Use the stated goal, relevant artifacts, and recorded checks to identify the next unfinished step. Ask which feature if several are plausible. |
+Read the relevant sibling skill before recommending its syntax or prerequisites. Those files own
+their execution rules; this guide does not override them.
+
+Name the user's **stage** — `setup`, `system`, `flow`, `drift`, `implement`, or `unknown` — from the
+map's stages and the evidence you gathered, then recommend that stage's command:
+
+- **setup** — two or more system sources compete and no `docs/uikit.md` resolves them: [setup](../setup/SKILL.md): `/uikit:setup`.
+- **system** — no approved system in a React, Astro, or Svelte project: [init-design-system](../init-design-system/SKILL.md): `/uikit:init-design-system`. Say that it creates a live `/uikit/design-system` route and authors the components natively in the project's stack.
+- **flow** — an approved system and a feature to draw: [prototype](../prototype/SKILL.md): `/uikit:prototype <feature>`. It produces a flow definition whose screens render the real components at a dev route, with mock data, not an interactive production feature. An existing flow needs changes: `/uikit:prototype update <flow> <change>` — the stage is still `flow`.
+- **drift** — open proposals or deferred drift decisions: [drift review](../prototype/DRIFT.md): `/uikit:prototype drift`. Drift is a component, variant, detail, or guideline departure the approved system does not provide.
+- **implement** — a flow ready to build against an approved system: [implement](../implement/SKILL.md): `/uikit:implement <flow>`. Preserves the project's native stack and verifies real behavior and system compliance.
+- **returning** — ongoing work: use the stated goal, relevant artifacts, and recorded checks to find the next unfinished step, and name that step's stage. Ask which feature if several are plausible.
 
 Treat these as entry points, not a sequence everyone must repeat. A project with an approved
 system can go to prototype or implement whatever its stack. Do not recommend React
@@ -96,25 +106,33 @@ inventing capabilities or forcing it through the pipeline.
 
 ## Reply
 
-Keep the usual answer to a short paragraph and one next action:
+Open every reply with the stage line, then the three fields, in exactly this shape. Fill the
+angle-bracketed slots. Do not reorder, rename, or drop them, and do not replace the line with a
+sentence: this contract is what makes every invocation read the same.
 
-1. **Where you are:** one or two relevant findings, with paths when useful.
-2. **Next:** one copyable command using the actual feature or quoted file path.
-3. **Why / result:** one sentence explaining what it accomplishes; include a
-   prerequisite or unresolved choice only when it affects the next step.
+**uikit · `<stage>` · `<status>`**
 
-If a missing answer prevents routing, ask that question instead of offering a
-placeholder command. Show alternatives only for a real decision or when asked for
-the full map. Returning users get current context, not the welcome tutorial again.
+- **Where you are:** <one or two findings, with paths when useful>
+- **Next:** `<command>`
+- **Why:** <one sentence explaining what it accomplishes>
+
+`<stage>` is one of `setup`, `system`, `flow`, `drift`, `implement`, `unknown`. `<status>` is two
+to four words: `ready`, `none found`, `1 flow, drift open`, `system found, flow missing`. Add a
+fourth field only for a real open decision. Show alternatives only for a real decision or when
+asked for the full map. Returning users get current context, not the welcome tutorial again.
 
 Example:
 
-> Found your design system and `docs/flows/invite-team.html`. The flow still has
-> an open Drawer proposal.
->
-> **Next:** `/uikit:prototype drift`
->
-> Review that proposal against the system before implementing the invitation flow.
+**uikit · `drift` · `1 flow, 1 open proposal`**
 
-Finish after the guidance. Recommendations are not proof that a build, visual
-review, connection check, or installation test has run.
+- **Where you are:** `docs/flows/invite-team.json` exists and the system renders at `/uikit/design-system`; the flow still has an open Drawer proposal.
+- **Next:** `/uikit:prototype drift`
+- **Why:** review that proposal against the system before implementing the invitation flow.
+
+If a missing answer prevents routing, ask that question on the **Next:** line instead of offering
+a placeholder command, and set `<stage>` to `unknown`. When instead the ambiguity is two or more
+competing system sources with no `docs/uikit.md` record to settle them, `setup` is the honest stage
+and `/uikit:setup` the next action.
+
+Finish after the guidance. Recommendations are not proof that a build, visual review, connection
+check, or installation test has run.
