@@ -20,6 +20,8 @@ those, this is an ordinary UI codebase: do not use uikit. When in doubt, hand of
 
 The canonical routing truth is [../../docs/map.md](../../docs/map.md). The compact form:
 
+0. **setup** (`/uikit:setup`, optional) — the pre-flight. Record the approved source, the stack,
+   and the flows location once, so init-design-system harvests the right source instead of asking.
 1. **init-design-system** (`/uikit:init-design-system`) — define the design system once per
    project; authors the components in the project's own stack.
 2. **prototype** (`/uikit:prototype <feature>`) — draw one feature as a flow against that

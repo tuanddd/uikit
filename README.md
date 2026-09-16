@@ -10,13 +10,13 @@ drawn as a diagram in the [field guide](docs/field-guide.html).
 | Skill | Invoke | Produces |
 |---|---|---|
 | what | `/uikit:what [question]` | Project-aware guidance on where to start or resume |
-| setup | `/uikit:setup` | A recorded `docs/uikit.md` — the approved system source, stack, and flows location — so the other skills stop guessing |
+| setup | `/uikit:setup` | The pre-flight before init-design-system: a recorded `docs/uikit.md` — the approved system source, stack, and flows location — so init harvests the right source and the other skills stop guessing |
 | init-design-system | `/uikit:init-design-system` | A live `/uikit/design-system` route plus the component setup in the project's own stack (React/shadcn, Astro, or Svelte/Bits UI) |
 | prototype | `/uikit:prototype <feature>` | A flow definition in `docs/flows/` plus a dev route `/uikit/flows/<feature>` drawn from the project's real components, with a drift ledger |
 | implement | `/uikit:implement <flow>` | Working feature code in the project's native stack, using approved system components and tokens with zero drift |
 | using-uikit | model-invoked | Orientation: the compact map, reached automatically when a session touches UI work |
 
-For a new design foundation, use init-design-system → prototype → implement. If you already have an approved system or feature flow, start at the relevant step; `/uikit:what` helps you choose. The design system is the base every prototype is drawn on; every prototype run ends by asking, for each new drift it drew, whether it goes back into the design system as a reusable component or stays a one-off in its flow. Drift already open across earlier flows, or answered *Decide later*, waits for `/uikit:prototype drift`. Implementation checks the current approved system: open proposals and reviewed one-offs cannot ship as exceptions. A system gap must be resolved in the system first.
+For a new design foundation, the ideal order is setup → init-design-system → prototype → implement: `/uikit:setup` (optional) records which existing files are the approved source, `init-design-system` builds the system from that, then you draw and build features. If you already have an approved system or feature flow, start at the relevant step; `/uikit:what` helps you choose. The design system is the base every prototype is drawn on; every prototype run ends by asking, for each new drift it drew, whether it goes back into the design system as a reusable component or stays a one-off in its flow. Drift already open across earlier flows, or answered *Decide later*, waits for `/uikit:prototype drift`. Implementation checks the current approved system: open proposals and reviewed one-offs cannot ship as exceptions. A system gap must be resolved in the system first.
 
 The design system is a **live route**, not a static page: `/uikit/design-system` renders the
 project's real components, so reviewing the system and reviewing the app are the same act. So
@@ -113,8 +113,11 @@ The [map](docs/map.md) is canonical, and `/uikit:what` routes within it. If you 
 thing: just installed, lost, or returning — run `/uikit:what`; it reads the project and names the
 actual next step. The [field guide](docs/field-guide.html) is the same map, drawn per skill.
 
-Optionally run `/uikit:setup` once per repo first, to record the approved system, the stack, and
-where flows live; without it the skills rediscover those each time and may disagree.
+The ideal order on a new project is `/uikit:setup` (optional) → `/uikit:init-design-system` →
+`/uikit:prototype` → `/uikit:implement`. Setup records the approved system, the stack, and where
+flows live; running it first is what stops `init-design-system` from having to ask whether to
+follow the repo's files or the skill defaults. Without it, the skills rediscover those facts each
+time and may disagree.
 
 You can ask a specific question too:
 
@@ -122,8 +125,8 @@ You can ask a specific question too:
 /uikit:what I already have a design system in Vue
 ```
 
-`what`, `init-design-system`, and `implement` can also match relevant
-natural-language requests. `prototype` requires explicit invocation.
+`what`, `init-design-system`, `implement`, and `using-uikit` can also match relevant
+natural-language requests. `setup` and `prototype` require explicit invocation.
 
 ## Requirements
 

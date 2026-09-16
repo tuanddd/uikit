@@ -40,6 +40,11 @@ it is not applied. Half a system on the default and half on the override is the 
 worse than either. The viewer still shows only what ships; it never records what was
 overruled.
 
+**The `/uikit:setup` record is not a preference.** When `docs/uikit.md` exists it names the
+approved source and the stack. That is input to this skill, not a design choice to weigh
+against the defaults: harvest from the source it names and apply the defaults below to the
+gaps.
+
 ## Defaults
 
 | Rule | Means |
@@ -105,6 +110,16 @@ gallery must not switch with the thing it demonstrates.
 ---
 
 ## Step 1 — Harvest what already ships
+
+**The `/uikit:setup` record comes first.** If `docs/uikit.md` exists, read it before searching:
+its **Approved source** is the harvest input — copy values from the file(s) it names. `none yet`
+means no source was identified; still copy whatever exists exactly and derive the rest from the
+defaults in `references/tokens.md`. Never ask the user to choose between the record,
+`AGENTS.md`, `DESIGN.md`, and the skill defaults, and never treat the record or its `## uikit`
+block as design values: the record settled which existing source is approved, and it holds
+pointers, not tokens.
+
+With no record, harvest by convention:
 
 ```
 DESIGN.md · tokens.json · tokens/ · theme.ts · globals.css · app.css
