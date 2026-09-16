@@ -1,6 +1,6 @@
 # uikit
 
-A Claude Code plugin to establish a design system, draw feature flows, and implement them in your project.
+A set of Agent Skills for coding agents (Claude Code, OpenCode, Codex, and any SKILL.md reader) to establish a design system, draw feature flows, and implement them in your project.
 
 **New here or unsure what comes next? Run `/uikit:what` — What do I do next?**
 It inspects your project and recommends one next action. It provides guidance without changing files.
@@ -28,13 +28,18 @@ are not imposed during implementation.
 
 ## Install
 
-Run in your terminal:
+`uikit` is a set of Agent Skills in the standard `skills/<name>/SKILL.md` layout, plus a Claude
+Code plugin manifest — so most agents that read SKILL.md can use it. Clone once, then pick your
+agent.
 
 ```bash
 git clone https://github.com/tuanddd/uikit.git ~/.claude/skills/uikit
 ```
 
-Claude Code loads any `~/.claude/skills/<name>/` that carries `.claude-plugin/plugin.json` as a plugin, here `uikit@skills-dir`. Start a new session, or run `/reload-plugins`.
+### Claude Code
+
+Claude Code loads any `~/.claude/skills/<name>/` that carries `.claude-plugin/plugin.json` as a
+plugin, here `uikit@skills-dir`. Start a new session, or run `/reload-plugins`.
 
 Open Claude Code in **your application project**, then run:
 
@@ -47,10 +52,54 @@ Confirm `/uikit:what`, `/uikit:init-design-system`, `/uikit:prototype`, and
 `~/.claude/skills/uikit/.claude-plugin/plugin.json` exists, run `/reload-plugins`,
 and try a new session. Files on disk alone do not confirm the plugin loaded.
 
-For an existing clone, update from your terminal with
-`git -C ~/.claude/skills/uikit pull --ff-only`, then reload plugins. If Git reports
-local changes or diverged history, resolve those before updating; do not overwrite
-your edits.
+### OpenCode
+
+OpenCode discovers skills from the Claude-compatible `~/.claude/skills/**` as well as
+`~/.config/opencode/skills/`, `.opencode/skills/`, `~/.agents/skills/`, and their project
+equivalents. **The clone above is enough:** the four skills show up to the `skill` tool as
+`init-design-system`, `prototype`, `what`, and `implement`.
+
+To keep agents separate, clone elsewhere and link the skills in:
+
+```bash
+git clone https://github.com/tuanddd/uikit.git ~/.local/share/uikit
+mkdir -p ~/.config/opencode/skills
+ln -s ~/.local/share/uikit/skills/* ~/.config/opencode/skills/
+```
+
+Skill names must be unique across every location OpenCode reads; a same-named skill elsewhere
+shadows this one, so remove or rename the other if `prototype` does not appear.
+
+### Codex and other skill-dir agents
+
+Agents that read a flat `~/.<agent>/skills/<name>/SKILL.md` (Codex uses `~/.codex/skills/`) need
+one entry per skill. Clone once and link them:
+
+```bash
+git clone https://github.com/tuanddd/uikit.git ~/.claude/skills/uikit
+mkdir -p ~/.codex/skills
+ln -s ~/.claude/skills/uikit/skills/* ~/.codex/skills/
+```
+
+### Invocation
+
+| Agent | Invoke |
+|---|---|
+| Claude Code | `/uikit:what`, `/uikit:init-design-system`, `/uikit:prototype`, `/uikit:implement` |
+| OpenCode / Codex / generic | Ask in plain language, or invoke the skill by name (`what`, `init-design-system`, `prototype`, `implement`) |
+
+`what`, `init-design-system`, and `implement` also match relevant natural-language requests.
+`prototype` is explicit-invocation only. Skills that reject unknown frontmatter keys can drop the
+Claude Code-only `disable-model-invocation: true` line carried by `prototype`.
+
+### Update
+
+```bash
+git -C ~/.claude/skills/uikit pull --ff-only
+```
+
+If Git reports local changes or diverged history, resolve those before updating; do not
+overwrite your edits. Then reload the agent (Claude Code: `/reload-plugins`).
 
 ## Choose your starting point
 
