@@ -66,10 +66,18 @@ map's stages and the evidence you gathered, then recommend that stage's command:
 
 - **setup** — two or more system sources compete and no `docs/uikit.md` resolves them: [setup](../setup/SKILL.md): `/uikit:setup`.
 - **system** — no approved system in a React, Astro, or Svelte project: [init-design-system](../init-design-system/SKILL.md): `/uikit:init-design-system`. Say that it creates a live `/uikit/design-system` route and authors the components natively in the project's stack.
-- **flow** — an approved system and a feature to draw: [prototype](../prototype/SKILL.md): `/uikit:prototype <feature>`. It produces a flow definition whose screens render the real components at a dev route, with mock data, not an interactive production feature. An existing flow needs changes: `/uikit:prototype update <flow> <change>` — the stage is still `flow`.
+- **flow** — an approved system and a feature to draw: [prototype](../prototype/SKILL.md): `/uikit:prototype <feature>`. It produces a flow definition whose screens render the real components at a dev route, with mock data, not an interactive production feature. The design system should exist first — see **Have a design system before the first flow** below. An existing flow needs changes: `/uikit:prototype update <flow> <change>` — the stage is still `flow`.
 - **drift** — open proposals or deferred drift decisions: [drift review](../prototype/DRIFT.md): `/uikit:prototype drift`. Drift is a component, variant, detail, or guideline departure the approved system does not provide.
 - **implement** — a flow ready to build against an approved system: [implement](../implement/SKILL.md): `/uikit:implement <flow>`. Preserves the project's native stack and verifies real behavior and system compliance.
 - **returning** — ongoing work: use the stated goal, relevant artifacts, and recorded checks to find the next unfinished step, and name that step's stage. Ask which feature if several are plausible.
+
+**Have a design system before the first flow.** `/uikit:prototype` draws every screen from the
+approved system — the live `/uikit/design-system` route, or the static page for a stack that
+cannot host one. That system is the output of `/uikit:init-design-system`. Running it first is
+highly recommended but **not a hard gate**: with no system, prototype falls back to whatever
+tokens the repo has and every component it draws counts as drift. On a project that has none, say
+plainly that the flow will be drawn against a stand-in and that `/uikit:init-design-system` is the
+strongly preferred first step; if the user chooses to proceed anyway, that is their call.
 
 Treat these as entry points, not a sequence everyone must repeat. A project with an approved
 system can go to prototype or implement whatever its stack. Do not recommend React
