@@ -22,7 +22,8 @@ number); `scripts/drift-report.py` reads JSON definitions and legacy HTML files;
 `scripts/flow-check.py` added; `scripts/sync-blocks.py` and `templates/flow.html` removed;
 `templates/flow.json` and `templates/FlowShell.tsx` added. The plugin README, `/uikit:what` and
 `/uikit:implement` follow. Plugin version 0.6.0. The Codex copy
-`~/.codex/skills/uikit-prototype` was re-synced.
+`~/.codex/skills/uikit-prototype` was re-synced, and so was `~/.codex/skills/uikit-implement`
+for the changed input contract; both validate.
 
 ## Structural validation
 
