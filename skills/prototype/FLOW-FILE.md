@@ -1,112 +1,202 @@
-# The flow file
+# The flow
 
-One static HTML file per feature. It shows the feature as a flow, start to end, one screen per step, with the reasoning and the build notes beside it. It is the reference a build starts from and the baseline the next feature is drawn against, so every file has the same anatomy.
+One feature, one **definition** (`docs/flows/<slug>.json`) and one **route**
+(`/uikit/flows/<slug>`) that renders it. The route composes the project's real components into
+each step's screen; the definition is the portable record the route renders and the scripts
+read. Neither carries a copy of a component's CSS.
 
-Where the project already has flow files, they are the format: copy the closest one. This page is the format for a project's first file, and the checklist for every file after it.
+`<slug>` is the definition's `slug` — `<group>-<NN>-<feature>`, e.g. `v1-13-direct-contact`.
+It is both the file name and the route segment.
+
+The route is a dev surface — hidden outside local and preview, unlinked, `noindex`,
+`robots.txt`-disallowed, off the sitemap, `data-dev-surface` — exactly like the design-system
+viewer.
 
 ## Where it lives
 
 ```
 docs/flows/
-  README.md                      index, mock values, the rules that keep drift down
-  <group>-<NN>-<feature>.html    e.g. v1-10-inquiry.html, v2-03-signed-documents.html
+  README.md                 index, mock values, the rules that keep drift down
+  <slug>.json               the definition, e.g. v1-13-direct-contact.json
+<dev>/flows/
+  FlowShell.<ext>           renders a definition: the doc shell around the screens
+  components/<Name>.<ext>   candidate components the drift needs, shared by flows
+<route>/uikit/flows/<slug>  the route file that pairs the definition with its screens
 ```
 
-`<group>` is the roadmap phase or product area; `<NN>` the feature's position in that list; `<feature>` kebab-case. When the existing files name themselves differently, follow them.
+`<group>` is the roadmap phase or product area; `<NN>` the feature's position; `<feature>`
+kebab-case. When the existing definitions name themselves differently, follow them.
 
-## The head
+`<dev>` is the project's dev area, the same one the design-system viewer's `Specimen` helper
+lives in: `src/dev` (React), `src/lib/dev` (Svelte), `src/components/dev` (Astro) — see the
+`init-design-system` skill's `references/setup.md` § What lands.
 
-```html
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{Feature} · {group} flow · {Product}</title>
-  <link rel="stylesheet" href="{the design system's web-font stylesheet}">
-  <style id="{prefix}-tokens">…</style>
-  <style id="{prefix}-base">…</style>
-  <style id="{prefix}-product">…</style>
-  <style id="flow-doc">…</style>
-  <style id="flow-local">…</style>
-</head>
+Route file per stack:
+
+```
+React    app/uikit/flows/<slug>/page.tsx       (App Router; src/app/ when present)
+         pages/uikit/flows/<slug>.tsx          (Pages Router)
+         app/routes/uikit.flows.<slug>.tsx     (Remix / React Router 7)
+Svelte   src/routes/uikit/flows/<slug>/+page.svelte
+Astro    src/pages/uikit/flows/<slug>.astro
 ```
 
-The doctype is required: without it the file renders in quirks mode, where tables stop inheriting colour and font.
+Static output and no-router SPAs: mount behind the same dev-only gate as the design-system
+viewer (`init-design-system/references/stacks.md` § 4).
 
-`{prefix}` is a short project slug (`wuk`, `acme`). Existing files already set it; keep theirs.
+## The definition
 
-## The style blocks
+JSON, one file per feature. It is data, not markup: the route renders it, `drift-report.py`
+reads the ledger, and `flow-check.py` validates it.
 
-| Block | Holds | Comes from | In |
-|---|---|---|---|
-| `{prefix}-tokens` | The `:root` custom properties, and `@font-face` rules if the system self-hosts | `docs/design-system.html`, verbatim | every file, identical |
-| `{prefix}-base` | The system's components, scoped under `.frame` | `docs/design-system.html` | every file, identical |
-| `{prefix}-product` | Components flow files proposed that are not in the system yet | flow files | every file, identical |
-| `flow-doc` | The page around the screens: header, bar, boards, tables, pager, fit script styles | [templates/flow.html](templates/flow.html) | every file, identical |
-| `flow-local` | This feature's one-off drift | this file | this file only; omit when empty |
+```json
+{
+  "feature": "Direct contact",
+  "slug": "v1-13-direct-contact",
+  "group": "v1",
+  "drawnOn": "2026-09-16",
+  "frameWidth": 1280,
+  "requirement": {
+    "text": "A visitor can reach the person who listed the home without leaving the listing.",
+    "source": "docs/FEATURES.md · v1 · Direct contact"
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "n": 1,
+      "title": "Inquiry, step 1: the home",
+      "state": "Default",
+      "route": "example.com/homes/house-name/ask",
+      "restsOn": "Zillow contact form · Airbnb names the recipient · Mobbin MCP",
+      "linkedTo": null
+    }
+  ],
+  "why": [
+    { "decision": "Ask dates before identity; identity last", "restsOn": "Mobbin MCP — Zillow, Airbnb", "confidence": "reference" },
+    { "decision": "The reply-time line shows both clocks", "restsOn": "the positioning doc, audience", "confidence": "principle" }
+  ],
+  "components": [
+    { "name": "Button", "class": ".btn", "from": "src/components/ui/Button", "steps": "1, 2" },
+    { "name": "Channel row", "class": ".channel", "from": "candidate:ChannelRow", "steps": "2" }
+  ],
+  "ledger": [
+    {
+      "name": "Channel row",
+      "class": ".channel",
+      "kind": "component",
+      "nearest": "Dialog · .dialog",
+      "why": "The listing must stay visible while the visitor writes; Dialog centres over a scrim",
+      "proposal": "promote",
+      "status": "open"
+    }
+  ]
+}
+```
 
-The four shared blocks are byte-identical across `docs/flows/`. Change one in one file, then copy it into the rest with `scripts/sync-blocks.py`; `--check` fails when any file differs.
-
-For a project's first flow file, build `{prefix}-tokens` and `{prefix}-base` from the design-system page's own `<style>`: the token declarations, and the CSS of each component scoped under `.frame` so the page chrome stays untouched. Then point the chrome variables at the top of `flow-doc` (`--a-serif`, `--a-sans` and the `--a-*` colours) at the system's font and neutral tokens.
-
-## The body
-
-In this order. Class names are the template's.
-
-| Section | Markup | Holds |
+| Field | Required | Values |
 |---|---|---|
-| Header | `header.a-head` | `h1` the feature · `p.a-meta` group, step count, frame width, "Static, mock values" · `p` the flow start to end in one paragraph · `figure.a-road` the requirement line, quoted, and where it comes from |
-| Bar | `nav.a-bar` | Link to the index, the section anchors, the Fit width / Actual size toggle |
-| The flow | `section#flow` › `ol.a-steps` | Every step in order: number, title, state, route, linking to `#step-N` |
-| Steps | `section#steps` › `article.a-board#step-N` | One board per step |
-| Why it looks like this | `section#why` › `table.a-tbl` | Decision · Rests on · Confidence (`a-conf--ref` for reference, `a-conf--pr` for principle) |
-| Building on it | `section#build` | Routes and mock values as `a-card`s · the Components table · the drift ledger |
-| Pager | `nav.a-pager` | Previous and next feature in the index |
-| Foot | `p.a-foot` | Part of `docs/flows`, the date it was drawn, what it was drawn on |
+| `feature`, `slug`, `group`, `drawnOn`, `frameWidth` | yes | The feature name; the slug (`<group>-<NN>-<feature>`, and the file name); the roadmap group; the date drawn; the desktop frame width (1280) |
+| `requirement.text`, `requirement.source` | yes | The roadmap line quoted, and where it comes from |
+| `steps` | yes, non-empty | One row per screen |
+| `steps[].id` | yes | `step-N`, unique; the anchor and the `screens` key |
+| `steps[].n` | yes | The integer in the id; the board number |
+| `steps[].title`, `state`, `route` | yes when drawn | The step title; the state shown (`Default`, `Validation error`, `Empty`, `Sent`, …); the real route |
+| `steps[].restsOn` | yes when drawn | One line: the reference or principle the step rests on |
+| `steps[].linkedTo` | yes | `null` when the step is drawn; `<other-slug>#step-3` when another flow draws it (a linked step needs only `id`, `n`, `title`, `linkedTo`) |
+| `why[].decision`, `restsOn`, `confidence` | yes | The decision; what it rests on; `reference` or `principle` |
+| `components[].name`, `class`, `from`, `steps` | yes | The component; its class; `src/…` (a system component, the project's own path), `candidate:<Name>`, or `—`; the step numbers it appears in |
+| `ledger[].name`, `class`, `kind`, `nearest`, `why`, `proposal`, `status` | yes | See DRIFT.md. `kind` ∈ `component`/`variant`/`detail`/`guideline`; `proposal` ∈ `promote`/`one-off`; `status` ∈ `open`/`promoted`/`folded`/`one-off` |
 
-A heading has no small label above it, in the chrome or in the screens.
+A flow with no drift carries `"ledger": []`, and the route says so in one line.
 
-### A board
+## The route
 
-```html
-<article class="a-board" id="step-2">
-  <div class="a-bh">
-    <span class="a-num">2</span>
-    <h3>Inquiry, step 2: how to reach you</h3>
-    <span class="a-state">One reply channel</span>
-    <code>example.com/homes/house-name/ask?step=2</code>
-  </div>
-  <p class="a-why"><b>Rests on</b> Zillow contact form · Airbnb names the recipient · Mobbin MCP</p>
-  <div class="a-stage">
-    <div class="frame">…the screen…</div>
-  </div>
-</article>
+The route imports the definition and the real components, and renders the shell with one
+screen per step. Screens are code — the components composed as the feature needs them.
+
+```tsx
+// React · app/uikit/flows/v1-13-direct-contact/page.tsx  (dev surface, not linked, gated)
+import { notFound } from "next/navigation";
+import { designSystemEnabled } from "@/dev/design-system-enabled";
+import { FlowShell } from "@/dev/flows/FlowShell";
+import { Button } from "@/components/ui/button";
+import { ChannelRow } from "@/dev/flows/components/ChannelRow";
+import def from "../../../../docs/flows/v1-13-direct-contact.json";
+
+function Step1() {
+  return <main>…Button…</main>;
+}
+function Step2() {
+  return <main>…ChannelRow…</main>;
+}
+
+export default function Page() {
+  if (!designSystemEnabled()) notFound();
+  return (
+    <div data-dev-surface>
+      <FlowShell def={def} screens={{ "step-1": <Step1 />, "step-2": <Step2 /> }} />
+    </div>
+  );
+}
 ```
 
-- `.frame` has a fixed width: 1280px for a desktop screen; `.frame frame--phone` is 390px, for a step whose layout forks on a phone. Follow the widths the existing files use.
-- The fit script scales each frame to its stage; nothing else in the file runs script.
-- The screen is static markup built from the base, product and local blocks.
-- An overlay (dialog, drawer, menu) is drawn open, in place, over the page it opens from, with its scrim.
-- A step another flow file already draws is not a board: its row in the flow list links to `other-file.html#step-N`.
+Import the definition by a path relative to the route file (four `../` from
+`app/uikit/flows/<slug>/`, one more when the project uses `src/app/`), or through a path alias
+if the project has one; TypeScript needs `resolveJsonModule`. The Svelte and Astro forms are
+the same in their syntax: import the definition, import the components, render
+`<FlowShell def={def} screens={{ "step-1": … }} />`, each screen a component or markup
+fragment. An overlay (dialog, drawer, menu) is drawn **open**, in place, over the page it opens
+from.
 
-### The Components table
+`FlowShell` renders, in this order, from the definition:
 
-| Component | Class | From | Steps |
-|---|---|---|---|
-| Button | `.btn` | docs/design-system.html | 1, 2 |
-| Channel row | `.channel` | Proposed in v1-13-direct-contact.html | 2 |
-| Drawer | `.drawer` | Proposed here | 2 |
+| Section | Holds |
+|---|---|
+| Header | the feature · group, step count, frame width, "Static, mock values" · the requirement, quoted, and its source |
+| Bar | link to `/uikit/flows` (the index), the section anchors |
+| The flow | every step in order: number, title, state, route, linking to `#step-N` |
+| Steps | one board per step: its stage holds that step's screen at `def.frameWidth` |
+| Why it looks like this | the `why` rows: decision · rests on · confidence |
+| Building on it | routes and mock values · the Components table · the drift ledger |
+| Pager | previous and next flow in the index |
+| Foot | part of `docs/flows`, the date drawn, what it was drawn on |
 
-Every class used inside a frame is in this table. `From` is `docs/design-system.html`, `Proposed in <file>`, or `Proposed here`. Every row that is not `docs/design-system.html` also has a row in the drift ledger ([DRIFT.md](DRIFT.md)).
+Author the shell once per project and reuse it in every flow, like the viewer's `Specimen`
+helper. [templates/FlowShell.tsx](templates/FlowShell.tsx) is a React reference; the Svelte and
+Astro forms follow the same props and section order. It reads the tokens for its own chrome; it
+never restyles a screened component.
+
+Frame width comes from `def.frameWidth` (1280 for desktop); a step whose layout forks on a
+phone is drawn in a `390px` frame, named in its own screen. The shell scales a frame to its
+stage; nothing else runs script.
+
+### Screens
+
+- **A system component covers the need** — import it and use it. Its props, variants and states
+  are the component's own. The content changes; the component does not.
+- **An earlier flow already proposed a component** — import that candidate (`from:
+  candidate:<Name>`); the second use is evidence for promoting it.
+- **Nothing covers it** — author a **candidate component** under `<dev>/flows/components/` from
+  the system's tokens, record it in the ledger, and import it. Never put a candidate in the
+  production component tree.
+
+A candidate is a real component in the project's stack, typed, with the states the ledger
+records. When the user promotes or folds it, it moves into the real component set and the
+viewer, and every flow that imports it switches to the system component.
 
 ## The index
 
 `docs/flows/README.md` carries:
 
-1. One line on what the files are, and that they open in a browser with no build step.
-2. **What the files are for:** onboarding, and the base a build takes routes, components, copy and decisions from.
-3. **Inside a file:** the sections table above, shortened.
-4. **Rules that keep drift down:** the shared blocks are identical in every file; a new feature starts as a copy of its closest file; screens are static with mock values; nothing outside the system's tokens; every drift is in the ledger, and the run that draws a new drift asks whether it joins the design system or stays a one-off.
-5. **The index:** a table per group, `# · Feature (linked) · Steps`.
-6. **Mock values:** today's date, the cast, the sample records every file uses. A file that needs a new value adds it here first.
+1. One line on what the flows are, and that they run as dev routes (`/uikit/flows`), hidden
+   outside local and preview.
+2. **What they are for:** onboarding, and the base a build takes routes, components, copy and
+   decisions from.
+3. **Inside a flow:** the section order above, shortened.
+4. **Rules that keep drift down:** a screen built from the system imports the system component;
+   a new feature starts from the closest existing flow; screens are static with mock values;
+   nothing outside the system's tokens; every drift is in the ledger, and the run that draws a
+   new drift asks whether it joins the design system or stays a one-off.
+5. **The index:** a table per group, `# · Feature (linked to its route) · Definition · Steps`.
+6. **Mock values:** today's date, the cast, the sample records every flow uses. A flow that
+   needs a new value adds it here first.

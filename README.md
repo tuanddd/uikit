@@ -9,20 +9,21 @@ It inspects your project and recommends one next action. It provides guidance wi
 |---|---|---|
 | what | `/uikit:what [question]` | Project-aware guidance on where to start or resume |
 | init-design-system | `/uikit:init-design-system` | A live `/uikit/design-system` route plus the component setup in the project's own stack (React/shadcn, Astro, or Svelte/Bits UI) |
-| prototype | `/uikit:prototype <feature>` | One self-contained HTML flow file per feature in `docs/flows/`, drawn on that design system, with a drift ledger |
-| implement | `/uikit:implement <flow.html>` | Working feature code in the project's native stack, using approved system components and tokens with zero drift |
+| prototype | `/uikit:prototype <feature>` | A flow definition in `docs/flows/` plus a dev route `/uikit/flows/<feature>` drawn from the project's real components, with a drift ledger |
+| implement | `/uikit:implement <flow>` | Working feature code in the project's native stack, using approved system components and tokens with zero drift |
 
 For a new design foundation, use init-design-system → prototype → implement. If you already have an approved system or feature flow, start at the relevant step; `/uikit:what` helps you choose. The design system is the base every prototype is drawn on; every prototype run ends by asking, for each new drift it drew, whether it goes back into the design system as a reusable component or stays a one-off in its flow. Drift already open across earlier flows, or answered *Decide later*, waits for `/uikit:prototype drift`. Implementation checks the current approved system: open proposals and reviewed one-offs cannot ship as exceptions. A system gap must be resolved in the system first.
 
 The design system is a **live route**, not a static page: `/uikit/design-system` renders the
-project's real components, so reviewing the system and reviewing the app are the same act. It
-is a dev surface — hidden outside local and preview, unlinked, `noindex`, and off the sitemap.
+project's real components, so reviewing the system and reviewing the app are the same act. So
+are the flows: `/uikit/flows/<feature>` renders each step from those same components. Both are
+dev surfaces — hidden outside local and preview, unlinked, `noindex`, and off the sitemap.
 
-`/uikit:implement docs/flows/feature.html` reads every screen and state, inspects the
+`/uikit:implement docs/flows/invite-team.json` reads every screen and state, inspects the
 actual codebase, maps UI to approved components, builds the feature, and verifies
 behavior, responsive rendering, accessibility, and design-system fidelity. It also
-accepts multiple paths, `docs/flows/*.html`, and `--system <path>`. Existing systems
-and stacks are preserved; the initialization skill's library and styling defaults
+accepts multiple flows, a legacy `docs/flows/*.html` file, and `--system <path>`. Existing
+systems and stacks are preserved; the initialization skill's library and styling defaults
 are not imposed during implementation.
 
 ## Install
@@ -58,9 +59,9 @@ your edits.
 | Just installed, lost, or returning to the project | `/uikit:what` |
 | React project needs a design foundation | `/uikit:init-design-system` |
 | Have an approved system and want to design a feature | `/uikit:prototype invite teammates` |
-| Need to change an existing flow | `/uikit:prototype update docs/flows/invite-team.html add an expired invitation state` |
+| Need to change an existing flow | `/uikit:prototype update docs/flows/invite-team.json add an expired invitation state` |
 | Have open or deferred system proposals | `/uikit:prototype drift` |
-| Have an approved system and a flow ready to build | `/uikit:implement docs/flows/invite-team.html` |
+| Have an approved system and a flow ready to build | `/uikit:implement docs/flows/invite-team.json` |
 
 You can ask a specific question too:
 
@@ -75,8 +76,8 @@ natural-language requests. `prototype` requires explicit invocation.
 
 - `/uikit:init-design-system`: a React, Astro, or Svelte web project it can wire components into. Other stacks fall back to a static design-system page.
 - `/uikit:what`: no paid tools required; access to your project helps it give specific guidance.
-- `/uikit:prototype`: a design system and `python3` for its helpers. Mobbin MCP is an optional paid reference source; without it, the skill asks whether to continue with free sources.
-- `/uikit:implement`: an existing project, an approved design system, and an HTML feature flow. Uses the project's build/test tooling and an available browser for visual and interaction verification; no Mobbin dependency.
+- `/uikit:prototype`: a design system it can render (a live route, or the static fallback page) and `python3` for its helpers. Mobbin MCP is an optional paid reference source; without it, the skill asks whether to continue with free sources.
+- `/uikit:implement`: an existing project, an approved design system, and a flow (a definition plus its route, or a legacy HTML file). Uses the project's build/test tooling and an available browser for visual and interaction verification; no Mobbin dependency.
 
 ## Layout
 
@@ -86,6 +87,6 @@ skills/
   what/                SKILL.md
   init-design-system/   SKILL.md, README.md, references/
   prototype/            SKILL.md, README.md, FLOW-FILE.md, DRIFT.md, CRAFT-RULES.md,
-                        REFERENCE-SOURCES.md, templates/flow.html, scripts/
+                        REFERENCE-SOURCES.md, templates/, scripts/
   implement/            SKILL.md
 ```

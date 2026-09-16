@@ -30,8 +30,9 @@ only the files needed to ground it. For a bare invocation, inspect the project:
   HTML page is its fallback for stacks it cannot wire. Existing native systems can be valid
   inputs; a route or an HTML page is not universally required. File existence alone does not
   establish approval. Ask if competing sources have no stated precedence.
-- Find `docs/flows/README.md`, relevant flow files, their drift rows, and any
-  implementation or verification notes. Read targeted sections of large HTML files.
+- Find `docs/flows/README.md`, the flow definitions (`docs/flows/*.json`) and their dev
+  routes (`/uikit/flows/<feature>`), any legacy `docs/flows/*.html`, their drift rows, and
+  implementation or verification notes. Read targeted sections of large files.
   Do not infer the current task from modification time or claim a feature is
   complete because a flow or component file exists.
 
@@ -54,10 +55,10 @@ These files own their execution rules; this guide does not override them.
 | User's situation | Recommendation |
 |---|---|
 | Existing React, Astro, or Svelte project needs a design foundation | [init-design-system](../init-design-system/SKILL.md): `/uikit:init-design-system`. Explain that it creates a live `/uikit/design-system` route and authors the components natively in the project's stack. |
-| Existing approved system, feature idea to explore | [prototype](../prototype/SKILL.md): `/uikit:prototype <feature>`. Produces static HTML screens and states, with mock data, rather than an interactive production feature. |
-| Existing flow needs changes | [prototype](../prototype/SKILL.md): `/uikit:prototype update <flow-file> <change>`. Reuse the existing file. |
+| Existing approved system, feature idea to explore | [prototype](../prototype/SKILL.md): `/uikit:prototype <feature>`. Produces a flow definition whose screens render the real components at a dev route, with mock data, rather than an interactive production feature. |
+| Existing flow needs changes | [prototype](../prototype/SKILL.md): `/uikit:prototype update <flow> <change>`. Reuse or update the existing definition and route. |
 | Open proposals or deferred drift decisions | [drift review](../prototype/DRIFT.md): `/uikit:prototype drift`. Drift means a component, variant, detail, or guideline departure that the approved system does not provide. |
-| Flow ready to build using an approved system | [implement](../implement/SKILL.md): `/uikit:implement <flow.html>`. Preserves the project's native stack and verifies real behavior and system compliance. |
+| Flow ready to build using an approved system | [implement](../implement/SKILL.md): `/uikit:implement <flow>`. Preserves the project's native stack and verifies real behavior and system compliance. |
 | Returning to ongoing work | Use the stated goal, relevant artifacts, and recorded checks to identify the next unfinished step. Ask which feature if several are plausible. |
 
 Treat these as entry points, not a sequence everyone must repeat. A project with an approved

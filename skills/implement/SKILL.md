@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Translate a feature's HTML flow file into working code in the current project. Inspect its screens, states, and UI, adapt to the actual tech stack, and reuse the approved design system with zero drift. Use for /uikit:implement or requests to implement an HTML feature flow in an existing codebase.
+description: Translate a feature's flow (a definition plus its dev route, or a legacy HTML file) into working code in the current project. Inspect its screens, states, and UI, adapt to the actual tech stack, and reuse the approved design system with zero drift. Use for /uikit:implement or requests to implement a feature flow in an existing codebase.
 ---
 
 # Implement
@@ -10,8 +10,9 @@ feature's intent, content, layout, and states; the project's approved design sys
 supplies its visual language and component rules. The existing codebase supplies
 the architecture. **No design-system drift is permitted.**
 
-**Input:** `/uikit:implement docs/flows/feature.html`. Also accept multiple paths,
-a glob such as `docs/flows/*.html`, and `--system <path>` to select the system.
+**Input:** `/uikit:implement docs/flows/feature.json` — a flow definition and the dev route
+that renders it. Also accept multiple flows, a legacy `docs/flows/*.html` file, and
+`--system <path>` to select the system.
 Resolve paths relative to the project root, preserve paths containing spaces, and
 list the matched files. No match or no input: request the missing path. Process
 every selected feature, following dependencies and reusing shared work.
@@ -60,36 +61,37 @@ HTML page, screenshot, iframe, or static mockup is not an implementation.
 ## 1. Read the flow as a feature specification
 
 Read repository instructions and relevant product constraints first. Then read the
-input HTML, its styles, assets, and implementation notes. Inspect rendered screens
-with an available browser tool, including phone frames and open overlays; source
-inspection alone does not reveal wrapping, clipping, or visual hierarchy. Inspect
-large files in relevant sections without skipping any selected screen or state.
+flow definition, the route's screen code, and its implementation notes. Inspect
+rendered screens with an available browser tool, including phone frames and open
+overlays; source inspection alone does not reveal wrapping, clipping, or visual
+hierarchy. Inspect large files in relevant sections without skipping any selected
+screen or state.
 
-For UIkit flows, read [the flow anatomy](../prototype/FLOW-FILE.md) and use:
+A UIkit flow is a definition plus a dev route, both owned by
+[prototype](../prototype/FLOW-FILE.md). A legacy flow is a self-contained HTML file.
 
 | Source | Extract |
 |---|---|
-| `#flow`, `.a-steps`, `.a-board#step-N` | Ordered steps, state labels, route hints, branches, cross-file step links |
-| `.frame` inside each board | The actual product UI, including overlays drawn open |
-| `#why`, `#build`, Components table | Intent, behavior notes, routes, mock values, component provenance |
-| `*-tokens`, `*-base` | Prototype snapshots to compare against the current system |
-| `*-product`, `flow-local`, drift rows | Proposed components and exceptions requiring reconciliation |
+| the definition JSON (`docs/flows/<flow>.json`) | The requirement and its source, every step (id, number, title, state, route, `Rests on`), the why rows, the components table, and the drift ledger |
+| the route (`/uikit/flows/<feature>`) and its screen code | The actual product UI per step, including overlays drawn open; the real components it imports are the provenance |
+| the route rendered in dev | Wrapping, clipping, hierarchy, and each state as it actually draws |
+| a legacy `.html` flow: `#flow`, `.a-steps`, `.a-board#step-N`, `.frame` | The same inventory, read from the HTML anatomy |
+| a legacy `.html` flow: `#why`, `#build`, components table, drift rows | Intent, routes, mock values, provenance |
 | `docs/flows/README.md` | Shared sample data and linked feature context, when present |
 
 Read [the drift schema](../prototype/DRIFT.md) when interpreting provenance. Its
 permission to prototype drift does **not** apply to implementation. Audit actual
 markup and styles too: a missing ledger row does not prove compliance.
 
-Follow cross-file step links and inspect the referenced screens needed for this
-feature. Resolve relative assets against the HTML's directory. A referenced feature
-that already exists should be connected, not rebuilt. Inspect dependencies without
-expanding the task to unrelated features. For ordinary HTML without UIkit classes,
-infer the same inventory from its sections, visible UI, links, and scripts; do not
-require the UIkit template or manufacture missing steps.
+Follow cross-flow step links and inspect the referenced screens needed for this
+feature. A referenced feature that already exists should be connected, not rebuilt.
+Inspect dependencies without expanding the task to unrelated features. For an
+ordinary flow without UIkit conventions, infer the same inventory from its steps,
+visible UI, links, and scripts; do not manufacture missing steps.
 
 Do not ship the documentation shell: board headers, step numbers outside the UI,
-rationale, component/drift tables, pagers, fit controls, fixed frame widths, and
-the scaling script. Product navigation actually inside a screen still belongs.
+rationale, component/drift tables, pagers, fit controls, fixed frame widths, and the
+scaling behaviour. Product navigation actually inside a screen still belongs.
 
 Keep a concise coverage map in the task's working notes:
 

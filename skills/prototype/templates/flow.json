@@ -1,0 +1,59 @@
+{
+  "feature": "Direct contact",
+  "slug": "v1-13-direct-contact",
+  "group": "v1",
+  "drawnOn": "2026-09-16",
+  "frameWidth": 1280,
+  "requirement": {
+    "text": "A visitor can reach the person who listed the home without leaving the listing.",
+    "source": "docs/FEATURES.md · v1 · Direct contact"
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "n": 1,
+      "title": "Inquiry, step 1: the home",
+      "state": "Default",
+      "route": "example.com/homes/house-name/ask",
+      "restsOn": "Zillow contact form · Airbnb names the recipient · Mobbin MCP",
+      "linkedTo": null
+    },
+    {
+      "id": "step-2",
+      "n": 2,
+      "title": "Inquiry, step 2: how to reach you",
+      "state": "Validation error",
+      "route": "example.com/homes/house-name/ask?step=2",
+      "restsOn": "A failed send keeps every field and names one next action · Mobbin MCP — Etsy",
+      "linkedTo": null
+    }
+  ],
+  "why": [
+    {
+      "decision": "Ask dates before identity; identity last",
+      "restsOn": "Mobbin MCP — Zillow, Airbnb",
+      "confidence": "reference"
+    },
+    {
+      "decision": "The reply-time line shows both clocks",
+      "restsOn": "the positioning doc, audience",
+      "confidence": "principle"
+    }
+  ],
+  "components": [
+    { "name": "Button", "class": ".btn", "from": "src/components/ui/Button", "steps": "1, 2" },
+    { "name": "Input", "class": ".input", "from": "src/components/ui/Input", "steps": "2" },
+    { "name": "Channel row", "class": ".channel", "from": "candidate:ChannelRow", "steps": "2" }
+  ],
+  "ledger": [
+    {
+      "name": "Channel row",
+      "class": ".channel",
+      "kind": "component",
+      "nearest": "Dialog · .dialog",
+      "why": "The listing must stay visible while the visitor writes; Dialog centres over a scrim",
+      "proposal": "promote",
+      "status": "open"
+    }
+  ]
+}

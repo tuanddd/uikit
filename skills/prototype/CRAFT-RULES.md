@@ -1,8 +1,12 @@
 # Craft rules
 
-Layout constraints every screen in a flow file is built against and checked against in Phase 5. Each one
+Layout constraints every screen in a flow is built against and checked against in Phase 5. Each one
 came from a defect that survived a full build, so none is optional. They are written as the
 constraint, then the CSS shape that satisfies it, then the check that catches a breach.
+
+The CSS below is illustrative: express it in the project's own styling — Tailwind utilities,
+scoped styles, or the components' props. The constraint and the check bind; the class names and
+syntax are examples.
 
 The theme under all of them: **repeated things are one object.** Siblings share an anatomy,
 a height contract, and an edge. Anything that lets one sibling drift from the next, by a

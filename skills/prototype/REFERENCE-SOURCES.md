@@ -30,7 +30,7 @@ The largest indexed corpus of real shipped app and web screens and multi-screen 
 
 1. Tell them plainly: "Mobbin is showing a sign-in wall. Sign in in the browser window, or say skip and I'll use the free sources."
 2. Wait for their explicit continue, then retry the same tab.
-3. **Never** route around it: no unblur extension, no scraping the gate, no logged-out trick. Hard Rule 9 in SKILL.md is not negotiable.
+3. **Never** route around it: no unblur extension, no scraping the gate, no logged-out trick. Hard Rule 10 in SKILL.md is not negotiable.
 
 Mining pattern:
 
@@ -102,7 +102,7 @@ Everything goes to `reference-bank.md` in the scratchpad before drawing. One row
 | 3 of 5 | The reply-time line shows both clocks | the positioning doc, audience section | principle, not reference |
 ```
 
-The rows become each board's *Rests on* line and the file's *Why it looks like this* table. `principle, not reference` rows are the likeliest to be wrong; they are named in the Phase 6 report.
+The rows become each step's *Rests on* line and the flow's *Why it looks like this* table. `principle, not reference` rows are the likeliest to be wrong; they are named in the Phase 6 report.
 
 ## How much to bank
 
