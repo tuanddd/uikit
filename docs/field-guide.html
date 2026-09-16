@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>uikit Field Guide</title>
+<meta name="description" content="How the three uikit skills hand files to each other to take a product brief to a working feature.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#F2F3F6;
+  --surface:#FFFFFF;
+  --surface-2:#E8EBF1;
+  --ink:#161A2B;
+  --muted:#555C72;
+  --rule:#D3D7E1;
+  --accent:#3144C9;
+  --on-accent:#FFFFFF;
+  --accent-soft:#E4E7FB;
+  --loop:#93570A;
+  --loop-soft:#F4E9D8;
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F121A;
+    --surface:#171B26;
+    --surface-2:#1D2230;
+    --ink:#E7E9F1;
+    --muted:#A0A6B8;
+    --rule:#2E3446;
+    --accent:#8D9BFF;
+    --on-accent:#0E1233;
+    --accent-soft:#1F2547;
+    --loop:#E4A64A;
+    --loop-soft:#302516;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F121A;
+  --surface:#171B26;
+  --surface-2:#1D2230;
+  --ink:#E7E9F1;
+  --muted:#A0A6B8;
+  --rule:#2E3446;
+  --accent:#8D9BFF;
+  --on-accent:#0E1233;
+  --accent-soft:#1F2547;
+  --loop:#E4A64A;
+  --loop-soft:#302516;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;padding-inline:20px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.wrap{max-width:1180px;margin-inline:auto}
+h1,h2,h3{text-wrap:balance}
+p,li,td{text-wrap:pretty}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+code{font-family:var(--f-mono);font-size:.84em}
+
+header{padding-block:56px 20px;display:grid;gap:16px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(2.6rem,7vw,4rem);line-height:.95;letter-spacing:-.025em;margin:0}
+h1 span{color:var(--accent)}
+.lead{font-size:clamp(1.15rem,2.4vw,1.4rem);line-height:1.4;max-width:34ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin:4px 0 0;font-size:15px;color:var(--muted)}
+.install{margin:0;max-width:100%;overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:10px 14px;font-family:var(--f-mono);font-size:13.5px;color:var(--ink);width:fit-content}
+
+.diagram{margin:28px 0 0}
+.scroll{overflow-x:auto;padding-block:4px 8px}
+.flow{display:block;width:100%;min-width:1080px;height:auto}
+.diagram figcaption{margin-top:14px;max-width:72ch;font-size:15.5px;color:var(--muted)}
+.hint{display:none;font-size:14px;color:var(--muted);margin:0 0 6px}
+@media (max-width:1100px){.hint{display:block}}
+
+.flow .ln{stroke:var(--muted);stroke-width:1.5;fill:none}
+.flow .lp{stroke:var(--loop);stroke-width:1.6;fill:none;stroke-dasharray:6 5}
+.flow .mk-muted{fill:var(--muted)}
+.flow .mk-loop{fill:var(--loop)}
+.flow .sheet{fill:var(--surface);stroke:var(--rule);stroke-width:1.2}
+.flow .fold{fill:var(--surface-2);stroke:var(--rule);stroke-width:1.2}
+.flow .node{fill:var(--accent)}
+.flow .ext{fill:var(--surface);stroke:var(--muted);stroke-width:1.2;stroke-dasharray:3 3}
+.flow .band{fill:var(--surface-2);stroke:var(--rule);stroke-width:1}
+.flow .slot{fill:var(--surface);stroke:var(--rule);stroke-width:1.2}
+.flow .slot-done{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.6}
+.flow .num-c{fill:var(--ground);stroke:var(--accent);stroke-width:1.6}
+.flow .frame{fill:var(--ground);stroke:var(--muted);stroke-width:1}
+.flow .ui-dim{fill:var(--muted);opacity:.45}
+.flow .ui-btn{fill:var(--accent)}
+.flow .ui-track{fill:var(--rule)}
+.flow .ui-knob{fill:var(--surface)}
+.flow .ui-input{fill:var(--ground);stroke:var(--rule);stroke-width:1.2}
+.flow .ui-bar{fill:var(--muted)}
+.flow .ledger{fill:var(--loop-soft)}
+.flow .ok-c{fill:var(--accent)}
+.flow .ok-t{fill:none;stroke:var(--on-accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.flow .dot{fill:var(--muted)}
+.flow text{font-family:var(--f-body)}
+.flow .t-node{fill:var(--on-accent);font-family:var(--f-display);font-size:17px;font-weight:600}
+.flow .t-node-sub{fill:var(--on-accent);font-size:13px;opacity:.88}
+.flow .t-num{fill:var(--accent);font-family:var(--f-display);font-size:12.5px;font-weight:700}
+.flow .t-file{fill:var(--ink);font-family:var(--f-mono);font-size:11.5px;font-weight:500}
+.flow .t-sm{fill:var(--muted);font-size:12.5px}
+.flow .t-edge{fill:var(--muted);font-size:12.5px}
+.flow .t-ext{fill:var(--ink);font-family:var(--f-display);font-size:14px;font-weight:600}
+.flow .t-band{fill:var(--ink);font-family:var(--f-display);font-size:15px;font-weight:600}
+.flow .t-done{fill:var(--ink);font-size:13.5px;font-weight:600}
+.flow .t-ledger{fill:var(--loop);font-size:12px;font-weight:600}
+.flow .t-loop{fill:var(--loop);font-size:12.5px;font-weight:600}
+.flow .t-loop-mono{fill:var(--loop);font-family:var(--f-mono);font-size:12px;font-weight:500}
+
+section{padding-block:48px}
+h2{font-family:var(--f-display);font-weight:600;font-size:clamp(1.6rem,3.4vw,2.1rem);line-height:1.1;letter-spacing:-.015em;margin:0}
+.section-intro{margin:10px 0 0;max-width:62ch;color:var(--muted)}
+.label{margin:0;font-family:var(--f-body);font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.run{list-style:none;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.run li{display:grid;align-content:start;gap:10px;border-top:2px solid var(--accent);padding-top:14px}
+.run .n{font-family:var(--f-display);font-weight:700;font-size:15px;color:var(--accent)}
+.run code{font-size:14px;color:var(--ink);overflow-wrap:anywhere;font-weight:500}
+.run p{margin:0;font-size:15.5px;color:var(--muted)}
+@media (max-width:820px){.run{grid-template-columns:1fr}}
+@media (max-width:560px){.run{grid-template-columns:1fr}}
+
+.skill{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:36px 56px;border-top:1px solid var(--rule)}
+.skill-head{display:grid;align-content:start;gap:16px}
+.skill h2{display:flex;align-items:center;gap:12px}
+.chip{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:17px;font-weight:700}
+.job{margin:0;font-size:1.12rem;line-height:1.45}
+.cmd{display:block;width:fit-content;max-width:100%;overflow-wrap:anywhere;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:8px 12px;font-size:14.5px;color:var(--ink)}
+.stops{display:grid;gap:8px}
+.stops ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:15.5px;color:var(--muted)}
+.stops li::marker{color:var(--loop)}
+
+.io{display:grid;grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:20px;align-items:start}
+.io-col{display:grid;gap:14px}
+.io-arrow{margin-top:44px;color:var(--muted)}
+.io-arrow svg{display:block;width:32px;height:14px}
+.items{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.items li{display:grid;gap:3px;padding-bottom:16px;border-bottom:1px solid var(--rule)}
+.items li:last-child{border-bottom:0;padding-bottom:0}
+.what{font-weight:600;color:var(--ink)}
+.what code{font-size:14px;font-weight:500}
+.items span{font-size:15.5px;color:var(--muted)}
+@media (max-width:900px){
+  .skill{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .io{grid-template-columns:1fr;gap:12px}
+  .io-arrow{margin-top:0;transform:rotate(90deg);width:32px}
+}
+
+.extra{grid-column:1/-1;display:grid;gap:16px;background:var(--surface);border-radius:12px;padding:24px}
+.specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 32px;margin:0}
+.specs div{display:grid;gap:4px;align-content:start}
+.specs dt{font-weight:600}
+.specs dd{margin:0;font-size:15.5px;color:var(--muted)}
+.bars{display:flex;align-items:flex-end;gap:5px;height:34px;margin-top:6px}
+.bars i{display:block;width:7px;height:calc(var(--v) * .5px);background:var(--accent);border-radius:1px}
+.bar-nums{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;word-spacing:2px}
+.fixed{margin:0;font-size:15.5px;border-top:1px solid var(--rule);padding-top:14px}
+@media (max-width:900px){.specs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.specs{grid-template-columns:1fr}.extra{padding:18px}}
+
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15.5px}
+th{text-align:left;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 20px 10px 0;white-space:nowrap}
+td{padding:12px 20px 12px 0;border-top:1px solid var(--rule);vertical-align:top}
+td:last-child,th:last-child{padding-right:0}
+td code{color:var(--ink);font-size:13.5px;font-weight:500;white-space:nowrap}
+.cmds td:first-child{width:46%}
+
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 28px;font-size:15.5px}
+.checks li{display:grid;grid-template-columns:18px 1fr;gap:8px}
+.checks li::before{content:"✓";color:var(--accent);font-weight:700}
+.rule-line{margin:0;font-size:15.5px;border-top:1px solid var(--rule);padding-top:14px}
+.rule-line strong{color:var(--loop)}
+
+.drift{border-top:1px solid var(--rule);display:grid;gap:24px}
+.drift .verdict{font-family:var(--f-mono);font-weight:500;color:var(--loop);white-space:nowrap}
+.drift td:first-child{width:14%}
+.drift td:nth-child(2){width:38%}
+.token-rule{margin:0;max-width:62ch;font-size:15.5px;color:var(--muted)}
+.review{display:grid;gap:14px;max-width:760px;background:var(--loop-soft);border-radius:12px;padding:24px}
+.review-h{margin:0;font-family:var(--f-display);font-weight:600;font-size:1.35rem;line-height:1.2}
+.review p{margin:0;max-width:64ch}
+.review .cmd{background:var(--surface)}
+.review-steps{margin:0;padding-left:22px;display:grid;gap:8px}
+.review-steps li::marker{color:var(--loop);font-weight:700}
+.review-steps strong{font-weight:600}
+.review-when{font-size:15.5px;color:var(--muted)}
+@media (max-width:560px){.review{padding:18px}}
+
+footer{border-top:1px solid var(--rule);padding-block:28px 64px;font-size:14.5px;color:var(--muted)}
+footer p{margin:0}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <h1><span>ui</span>kit</h1>
+    <p class="lead">Three skills for coding agents — Claude Code, OpenCode, Codex — that take a product brief to a working feature. Each one reads what the last one wrote.</p>
+    <p class="meta"><span>Plugin v0.6.0</span><a href="https://github.com/tuanddd/uikit">github.com/tuanddd/uikit</a></p>
+    <pre class="install">git clone https://github.com/tuanddd/uikit.git ~/.claude/skills/uikit</pre>
+  </header>
+
+  <figure class="diagram">
+    <p class="hint">Scroll sideways to follow the whole flow.</p>
+    <div class="scroll">
+      <svg class="flow" viewBox="0 0 1248 560" role="img" aria-label="PRODUCT.md feeds init-design-system, which renders the /uikit/design-system route and authors components in your codebase. prototype reads the design system, the feature roadmap and Mobbin references, and writes a flow definition plus a /uikit/flows route per feature. implement reads the flow and your codebase, and builds the working feature from the real components. Two dashed loops: the next feature starts from the closest flow, and each prototype run ends by asking which new drift joins the design system.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path class="mk-muted" d="M0,0 L10,5 L0,10 Z"/></marker>
+          <marker id="ah-loop" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path class="mk-loop" d="M0,0 L10,5 L0,10 Z"/></marker>
+        </defs>
+
+        <rect class="band" x="14" y="414" width="1220" height="134" rx="12"/>
+        <text class="t-band" x="32" y="446">Your codebase</text>
+        <text class="t-sm" x="32" y="468">React · Astro · Svelte</text>
+
+        <rect class="slot" x="236" y="452" width="358" height="78" rx="8"/>
+        <text class="t-file" x="252" y="484">components/ui/*</text>
+        <text class="t-sm" x="252" y="507">shadcn · Bits UI · native, on the tokens</text>
+        <rect class="ui-btn" x="468" y="470" width="50" height="18" rx="9"/>
+        <rect class="ui-track" x="528" y="470" width="32" height="18" rx="9"/>
+        <circle class="ui-knob" cx="537" cy="479" r="6"/>
+        <rect class="ui-input" x="468" y="496" width="92" height="18" rx="5"/>
+
+        <rect class="slot-done" x="998" y="452" width="220" height="78" rx="8"/>
+        <text class="t-file" x="1014" y="484">routes/&lt;feature&gt;</text>
+        <text class="t-done" x="1014" y="507">Working feature</text>
+        <circle class="ok-c" cx="1194" cy="476" r="10"/>
+        <polyline class="ok-t" points="1189,476 1193,480 1200,472"/>
+
+        <path class="ln" d="M598,491 H995" marker-end="url(#ah)"/>
+        <text class="t-edge" x="796" y="481" text-anchor="middle">built from these components, zero drift</text>
+
+        <path class="ln" d="M94,146 V74 H690 V168" marker-end="url(#ah)"/>
+        <text class="t-edge" x="392" y="64" text-anchor="middle">feature roadmap</text>
+
+        <rect class="ext" x="764" y="36" width="196" height="58" rx="29"/>
+        <text class="t-ext" x="862" y="61" text-anchor="middle">Mobbin MCP</text>
+        <text class="t-sm" x="862" y="80" text-anchor="middle">paid · shipped app flows</text>
+        <path class="ln" d="M800,94 V168" marker-end="url(#ah)"/>
+        <text class="t-edge" x="810" y="134">references</text>
+
+        <path class="ln" d="M178,210 H217" marker-end="url(#ah)"/>
+        <text class="t-edge" x="197" y="199" text-anchor="middle">reads</text>
+        <path class="ln" d="M394,210 H433" marker-end="url(#ah)"/>
+        <text class="t-edge" x="414" y="199" text-anchor="middle">writes</text>
+        <path class="ln" d="M600,210 H639" marker-end="url(#ah)"/>
+        <text class="t-edge" x="620" y="199" text-anchor="middle">reads</text>
+        <path class="ln" d="M816,210 H855" marker-end="url(#ah)"/>
+        <text class="t-edge" x="836" y="199" text-anchor="middle">writes</text>
+        <path class="ln" d="M1022,210 H1061" marker-end="url(#ah)"/>
+        <text class="t-edge" x="1042" y="199" text-anchor="middle">reads</text>
+
+        <path class="lp" d="M900,274 V306 H760 V253" marker-end="url(#ah-loop)"/>
+        <text class="t-loop" x="830" y="328" text-anchor="middle">next feature starts from the closest flow</text>
+        <path class="lp" d="M980,274 V366 H540 V277" marker-end="url(#ah-loop)"/>
+        <text class="t-loop" x="760" y="386" text-anchor="middle">each run ends by asking what joins the system</text>
+        <text class="t-loop-mono" x="760" y="403" text-anchor="middle">deferred: /uikit:prototype drift</text>
+
+        <path class="ln" d="M305,253 V449" marker-start="url(#ah)" marker-end="url(#ah)"/>
+        <text class="t-edge" x="316" y="320">reads stack + tokens</text>
+        <text class="t-edge" x="316" y="338">installs components</text>
+        <path class="ln" d="M1149,253 V449" marker-start="url(#ah)" marker-end="url(#ah)"/>
+        <text class="t-edge" x="1140" y="320" text-anchor="end">reads the codebase</text>
+        <text class="t-edge" x="1140" y="338" text-anchor="end">builds the feature</text>
+
+        <path class="sheet" d="M14,146 H156 L174,164 V274 H14 Z"/>
+        <path class="fold" d="M156,146 V164 H174 Z"/>
+        <text class="t-file" x="28" y="178">PRODUCT.md</text>
+        <circle class="dot" cx="31" cy="202" r="2.5"/>
+        <text class="t-sm" x="40" y="206">vision</text>
+        <circle class="dot" cx="31" cy="226" r="2.5"/>
+        <text class="t-sm" x="40" y="230">business model</text>
+        <circle class="dot" cx="31" cy="250" r="2.5"/>
+        <text class="t-sm" x="40" y="254">feature roadmap</text>
+
+        <path class="sheet" d="M436,146 H578 L596,164 V274 H436 Z"/>
+        <path class="fold" d="M578,146 V164 H596 Z"/>
+        <text class="t-file" x="448" y="178">design-system route</text>
+        <rect x="448" y="190" width="20" height="18" rx="3" fill="#3B5BDB"/>
+        <rect x="472" y="190" width="20" height="18" rx="3" fill="#E08A3C"/>
+        <rect x="496" y="190" width="20" height="18" rx="3" fill="#3A4052"/>
+        <rect x="520" y="190" width="20" height="18" rx="3" fill="#8D93A6"/>
+        <rect x="544" y="190" width="20" height="18" rx="3" fill="#DCDFE8" stroke="#B9BECB" stroke-width="1"/>
+        <rect class="ui-bar" x="448" y="256" width="6" height="2"/>
+        <rect class="ui-bar" x="458" y="254" width="6" height="4"/>
+        <rect class="ui-bar" x="468" y="252" width="6" height="6"/>
+        <rect class="ui-bar" x="478" y="250" width="6" height="8"/>
+        <rect class="ui-bar" x="488" y="246" width="6" height="12"/>
+        <rect class="ui-bar" x="498" y="242" width="6" height="16"/>
+        <rect class="ui-bar" x="508" y="234" width="6" height="24"/>
+        <rect class="ui-bar" x="518" y="226" width="6" height="32"/>
+        <rect x="538" y="240" width="46" height="18" rx="9" fill="#3B5BDB"/>
+
+        <path class="sheet" d="M858,146 H1000 L1018,164 V274 H858 Z"/>
+        <path class="fold" d="M1000,146 V164 H1018 Z"/>
+        <text class="t-file" x="870" y="178">flows/*.json</text>
+        <rect class="frame" x="870" y="190" width="40" height="36" rx="4"/>
+        <rect class="ui-dim" x="876" y="197" width="28" height="3"/>
+        <rect class="ui-dim" x="876" y="204" width="18" height="3"/>
+        <rect class="ui-btn" x="876" y="212" width="16" height="7" rx="2"/>
+        <rect class="frame" x="916" y="190" width="40" height="36" rx="4"/>
+        <rect class="ui-dim" x="922" y="197" width="28" height="3"/>
+        <rect class="ui-dim" x="922" y="204" width="24" height="3"/>
+        <rect class="ui-btn" x="922" y="212" width="16" height="7" rx="2"/>
+        <rect class="frame" x="962" y="190" width="40" height="36" rx="4"/>
+        <rect class="ui-dim" x="968" y="197" width="28" height="3"/>
+        <rect class="ui-dim" x="968" y="204" width="12" height="3"/>
+        <rect class="ui-btn" x="968" y="212" width="16" height="7" rx="2"/>
+        <rect class="ledger" x="870" y="236" width="132" height="24" rx="4"/>
+        <text class="t-ledger" x="880" y="252">drift ledger</text>
+
+        <rect class="node" x="220" y="170" width="170" height="80" rx="10"/>
+        <text class="t-node" x="305" y="206" text-anchor="middle">init-design-system</text>
+        <text class="t-node-sub" x="305" y="229" text-anchor="middle">defines the system</text>
+        <circle class="num-c" cx="236" cy="170" r="11"/>
+        <text class="t-num" x="236" y="174.5" text-anchor="middle">1</text>
+
+        <rect class="node" x="642" y="170" width="170" height="80" rx="10"/>
+        <text class="t-node" x="727" y="206" text-anchor="middle">prototype</text>
+        <text class="t-node-sub" x="727" y="229" text-anchor="middle">draws the flows</text>
+        <circle class="num-c" cx="658" cy="170" r="11"/>
+        <text class="t-num" x="658" y="174.5" text-anchor="middle">2</text>
+
+        <rect class="node" x="1064" y="170" width="170" height="80" rx="10"/>
+        <text class="t-node" x="1149" y="206" text-anchor="middle">implement</text>
+        <text class="t-node-sub" x="1149" y="229" text-anchor="middle">builds the feature</text>
+        <circle class="num-c" cx="1080" cy="170" r="11"/>
+        <text class="t-num" x="1080" y="174.5" text-anchor="middle">3</text>
+      </svg>
+    </div>
+    <figcaption>Each skill reads what the one before it wrote. The dashed loops keep drift out: a new feature starts from the closest flow, and each prototype run ends by asking which of its drift <a href="#drift-h">joins the design system</a>.</figcaption>
+  </figure>
+
+  <section aria-labelledby="run-h">
+    <h2 id="run-h">Run it in this order</h2>
+    <ol class="run">
+      <li>
+        <span class="n">1</span>
+        <code>/uikit:init-design-system</code>
+        <p>Once per project, with a PRODUCT.md in the repo.</p>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <code>/uikit:prototype &lt;feature&gt;</code>
+        <p>Once per feature on the roadmap. Checks the Mobbin MCP first, and ends by asking which new drift joins the design system.</p>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <code>/uikit:implement docs/flows/&lt;feature&gt;.json</code>
+        <p>When a flow is approved. Builds it into the real app.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="skill" aria-labelledby="init-h">
+    <div class="skill-head">
+      <h2 id="init-h"><span class="chip">1</span>init-design-system</h2>
+      <p class="job">Turns the product brief into a design system, rendered as a live dev route and authored as real components in the project's own stack.</p>
+      <code class="cmd">/uikit:init-design-system</code>
+      <div class="stops">
+        <h3 class="label">Stops to ask when</h3>
+        <ul>
+          <li>The stack is not React, Astro or Svelte. Those three get native components and a live route; anything else falls back to the static page plus <code>tokens.css</code>.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="io">
+      <div class="io-col">
+        <h3 class="label">Takes</h3>
+        <ul class="items">
+          <li><span class="what"><code>PRODUCT.md</code></span><span>Vision, business model, audience. Shapes the one domain component only this product would build.</span></li>
+          <li><span class="what">Tokens already in the repo</span><span><code>DESIGN.md</code>, <code>tokens.json</code>, <code>tailwind.config.*</code>, <code>globals.css</code>. Reused exactly; only gaps get filled.</span></li>
+          <li><span class="what">Your stack</span><span>Read from <code>package.json</code>. React (shadcn), Svelte (Bits UI) and Astro get a live route and components; other stacks fall back to the page.</span></li>
+        </ul>
+      </div>
+      <div class="io-arrow" aria-hidden="true"><svg viewBox="0 0 32 14"><path d="M1,7 H29" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M23,2 L30,7 L23,12" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+      <div class="io-col">
+        <h3 class="label">Gives</h3>
+        <ul class="items">
+          <li><span class="what"><code>/uikit/design-system</code></span><span>A live dev route rendering logo, color, type, spacing, radius, border, shadow, icons and the real components. Every value drawn, not described.</span></li>
+          <li><span class="what"><code>components/ui/*</code></span><span>Components authored on those tokens — shadcn (React), Bits UI (Svelte), native (Astro) — plus the domain component.</span></li>
+          <li><span class="what">A project that still builds</span><span>Typechecks with the new components in place, ready for the next skill to use.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="extra">
+      <h3 class="label">Ships with these defaults unless you ask otherwise</h3>
+      <dl class="specs">
+        <div><dt>Color</dt><dd>OKLCH only. One primary for actions, one accent for highlights; neutrals derive from the primary.</dd></div>
+        <div><dt>Spacing</dt><dd>4-point scale, nothing between the steps.</dd><dd class="bars" aria-label="Spacing steps 4, 8, 12, 16, 24, 32, 48, 64"><i style="--v:4"></i><i style="--v:8"></i><i style="--v:12"></i><i style="--v:16"></i><i style="--v:24"></i><i style="--v:32"></i><i style="--v:48"></i><i style="--v:64"></i></dd><dd class="bar-nums" aria-hidden="true">4 8 12 16 24 32 48 64</dd></div>
+        <div><dt>Type</dt><dd>About 1.2 modular scale. Weights 400 and 500.</dd></div>
+        <div><dt>Surfaces</dt><dd>Three-layer shadow-border. Five radius tokens, five shadow tokens.</dd></div>
+        <div><dt>Icons</dt><dd>HugeIcons, one set, sizes on the scale.</dd></div>
+        <div><dt>Motion</dt><dd>Named properties, ease-out, under 200ms.</dd></div>
+      </dl>
+      <p class="fixed">Two rules never move, whatever you ask: WCAG contrast, and an accessible name on every control.</p>
+    </div>
+  </section>
+
+  <section class="skill" aria-labelledby="proto-h">
+    <div class="skill-head">
+      <h2 id="proto-h"><span class="chip">2</span>prototype</h2>
+      <p class="job">Draws one feature start to end as a flow definition plus a dev route that renders every step from the real components, then asks which new drift joins the system.</p>
+      <code class="cmd">/uikit:prototype &lt;feature&gt;</code>
+      <div class="stops">
+        <h3 class="label">Stops to ask when</h3>
+        <ul>
+          <li>The Mobbin MCP isn't connected. You can connect it or continue on free sources.</li>
+          <li>No design system is found.</li>
+          <li>A screen needs a color, typeface, radius or shadow the system doesn't have.</li>
+          <li>The run ends: for each new drift, fold it into the design system or keep it as a one-off.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="io">
+      <div class="io-col">
+        <h3 class="label">Takes</h3>
+        <ul class="items">
+          <li><span class="what">The live design system</span><span><code>/uikit/design-system</code> and the components it imports. Every screen starts from them. No Modal when there is a Dialog.</span></li>
+          <li><span class="what"><code>PRODUCT.md</code></span><span>The roadmap line the feature implements, plus audience and voice.</span></li>
+          <li><span class="what">Mobbin MCP</span><span>How shipped apps solved each step. Paid, and checked before any research starts.</span></li>
+          <li><span class="what"><code>docs/flows/*.json</code></span><span>Flows already drawn. The closest is the starting point; a component it proposed is reused as a candidate.</span></li>
+        </ul>
+      </div>
+      <div class="io-arrow" aria-hidden="true"><svg viewBox="0 0 32 14"><path d="M1,7 H29" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M23,2 L30,7 L23,12" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+      <div class="io-col">
+        <h3 class="label">Gives</h3>
+        <ul class="items">
+          <li><span class="what"><code>docs/flows/&lt;slug&gt;.json</code> + <code>/uikit/flows/&lt;slug&gt;</code></span><span>Every step and state as a screen, composed from the real components. Mock values.</span></li>
+          <li><span class="what">Decisions with sources</span><span>Why each screen looks the way it does, and the shipped product it rests on.</span></li>
+          <li><span class="what">Drift ledger</span><span>What the system didn't cover, why, and your answer on whether each one joins the system.</span></li>
+          <li><span class="what"><code>docs/flows/README.md</code></span><span>The index of flows, plus the mock values every flow shares.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="extra">
+      <h3 class="label">Other ways to run it</h3>
+      <div class="tbl-wrap">
+        <table class="cmds">
+          <tbody>
+            <tr><td><code>/uikit:prototype &lt;feature&gt;, &lt;feature&gt;</code></td><td>One flow per feature, drawn one at a time.</td></tr>
+            <tr><td><code>/uikit:prototype update &lt;flow&gt; &lt;change&gt;</code></td><td>Redraws or adds steps in a flow that already exists.</td></tr>
+            <tr><td><code>/uikit:prototype migrate &lt;flow.html&gt;</code></td><td>Converts a legacy HTML flow to a definition and a route.</td></tr>
+            <tr><td><code>/uikit:prototype drift</code></td><td>Asks again about drift still open: answered Decide later, or already open across several flows. <a href="#drift-h">How it works</a></td></tr>
+            <tr><td><code>/uikit:prototype &lt;feature&gt; --system &lt;path&gt;</code></td><td>Uses a different path as the design system.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fixed">Writes to <code>docs/flows/</code> and the dev flow area only. Candidates never enter the production component tree; promotion is the one exception.</p>
+    </div>
+  </section>
+
+  <section class="skill" aria-labelledby="impl-h">
+    <div class="skill-head">
+      <h2 id="impl-h"><span class="chip">3</span>implement</h2>
+      <p class="job">Builds the flow into the real codebase, in the project's own stack, with zero design-system drift.</p>
+      <code class="cmd">/uikit:implement docs/flows/&lt;feature&gt;.json</code>
+      <div class="stops">
+        <h3 class="label">Stops to ask when</h3>
+        <ul>
+          <li>No approved design system exists, or two sources conflict.</li>
+          <li>The system lacks a component the flow needs. The system gets updated first.</li>
+          <li>A backend contract is missing. The UI gets built; the operation is reported as blocked.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="io">
+      <div class="io-col">
+        <h3 class="label">Takes</h3>
+        <ul class="items">
+          <li><span class="what"><code>docs/flows/&lt;feature&gt;.json</code></span><span>The definition and the dev route that renders it. A legacy <code>docs/flows/*.html</code> works too.</span></li>
+          <li><span class="what">The approved design system</span><span>The route, its tokens and the real components. <code>--system &lt;path&gt;</code> picks one.</span></li>
+          <li><span class="what">Your codebase</span><span>Framework, routes, data, forms and tests, all kept as they are.</span></li>
+        </ul>
+      </div>
+      <div class="io-arrow" aria-hidden="true"><svg viewBox="0 0 32 14"><path d="M1,7 H29" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M23,2 L30,7 L23,12" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+      <div class="io-col">
+        <h3 class="label">Gives</h3>
+        <ul class="items">
+          <li><span class="what">Native routes and components</span><span>Written in the project's stack. Not a copied HTML page, screenshot or iframe.</span></li>
+          <li><span class="what">Every state wired</span><span>Validation, loading, empty, error, success and back. Success follows a real response, never a timer.</span></li>
+          <li><span class="what">A report</span><span>Changed code paths, checks run with their results, substitutions made, anything blocked.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="extra">
+      <h3 class="label">Done only after these ran</h3>
+      <ul class="checks">
+        <li>Build, typecheck and tests</li>
+        <li>Every step walked in a browser</li>
+        <li>Screenshots at phone and desktop widths</li>
+        <li>Contrast measured on the rendered page</li>
+        <li>Drift audit of the changed code</li>
+      </ul>
+      <p class="rule-line"><strong>Recorded drift is still drift.</strong> A flow marked one-off or proposed is not permission to ship it.</p>
+    </div>
+  </section>
+
+  <section class="drift" aria-labelledby="drift-h">
+    <div>
+      <h2 id="drift-h">How drift stays out</h2>
+      <p class="section-intro">Drift is anything a flow draws that the design system doesn't already provide. Prototype may drift, as long as it writes it down in the ledger. Implement may not.</p>
+    </div>
+    <div class="review">
+      <h3 class="review-h">The fold-back questions</h3>
+      <p>Every prototype run ends here, with no extra command. It asks about each new drift the run drew: one no other flow has, its second use, a one-off another flow now reuses, or a broken guideline.</p>
+      <ol class="review-steps">
+        <li><strong>Tallies</strong> the files the run drew and picks out the new drift.</li>
+        <li><strong>Re-checks</strong> each one against the current system. A drift the system now covers is swapped for that component, not asked about.</li>
+        <li><strong>Recommends</strong> an answer: keep it as a one-off when it is minor or specific to this feature, fold it into the nearest component, or add it to the system when two or more flows use it.</li>
+        <li><strong>Asks</strong> one question per drift, recommendation first, with Decide later as an option. Nothing is applied before you answer.</li>
+        <li><strong>Applies</strong> your answers: a promoted candidate becomes a real component in the component set and the viewer, and every flow that used it switches to it. Then it checks each flow still renders.</li>
+      </ol>
+      <p class="review-when">Drift you answer Decide later, and drift already open across several earlier flows, waits for <code>/uikit:prototype drift</code>, which asks the same questions across every flow. Each run offers to go through that list before it ends.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Verdict</th><th scope="col">What it becomes</th><th scope="col">When implemented</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="verdict">promote</td><td>A new component in the real component set and the viewer. Every later flow imports it.</td><td>Used, once it exists in the approved system.</td></tr>
+          <tr><td class="verdict">fold</td><td>A variant of a component the system already has.</td><td>Used, once the variant exists.</td></tr>
+          <tr><td class="verdict">one-off</td><td>Stays a candidate in the dev flow area.</td><td>Swapped for an approved component, or blocked until the system covers it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="token-rule">Tokens never drift. A new color, typeface, radius or shadow is asked for before it is drawn.</p>
+  </section>
+
+  <footer>
+    <p>Read from <a href="https://github.com/tuanddd/uikit">tuanddd/uikit</a> at plugin v0.6.0 on 16 September 2026.</p>
+  </footer>
+</div>
+
+</body>
+</html>
