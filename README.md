@@ -1,6 +1,13 @@
 # uikit
 
+<img width="2560" height="1280" alt="uikit-logo" src="https://github.com/user-attachments/assets/c4a3ef6c-173e-4881-8f14-a484a26dd96d" />
+
+
+
 A set of Agent Skills for coding agents (Claude Code, OpenCode, Codex, and any SKILL.md reader) to establish a design system, draw feature flows, and implement them in your project.
+
+
+<img width="2560" height="1280" alt="uikit-field-guide-map" src="https://github.com/user-attachments/assets/2fede1c5-6ceb-484a-88f6-2198e14b3371" />
 
 **New here or unsure what comes next? Run `/uikit:what` — What do I do next?**
 It inspects your project and recommends one next action. It provides guidance without changing files.
